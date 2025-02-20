@@ -90,8 +90,9 @@ export default {
       absensiSiswa: [],
       filterJurusan: null,
       filterKelas: null,
-      jurusanList: ["RPL", "TKJ", "DPIB", "TBSM"],
-      kelasList: ["A", "B", "C"],
+      // Diubah sesuai permintaan
+      jurusanList: ["RPL", "MPLB", "PH"],  // Diubah jurusannya
+      kelasList: ["10A", "10B", "10C", "11A", "11B", "11C", "12A", "12B", "12C"],  // Filter kelas 10, 11, 12
     };
   },
   computed: {

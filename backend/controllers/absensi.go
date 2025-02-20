@@ -98,3 +98,4 @@ func GetAbsensi(c *gin.Context) {
 	// Kirim respons sukses
 	c.JSON(http.StatusOK, gin.H{"data": absensi})
 }
+

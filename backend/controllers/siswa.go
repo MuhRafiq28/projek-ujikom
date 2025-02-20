@@ -4,7 +4,8 @@ import (
     "net/http"
     "backend/database"
     "backend/models"
-
+    "fmt"
+    "strconv"
     "github.com/gin-gonic/gin"
 )
 
@@ -58,4 +59,44 @@ func CreateSiswaBatch(c *gin.Context) {
 }
 
 
+func UpdateSiswa(c *gin.Context) {
+	// Mengambil id dari URL parameter
+	id := c.Param("id")
+	
+	// Menambahkan log untuk memastikan ID yang diterima
+	fmt.Println("ID yang diterima:", id)
+
+	// Mengonversi id ke uint (sesuaikan dengan tipe data ID di model Siswa)
+	idUint, err := strconv.ParseUint(id, 10, 32) // Parse ke uint (32-bit)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID tidak valid"})
+		return
+	}
+
+	var siswa models.Siswa
+
+	// Mencari siswa berdasarkan ID
+	if err := database.DB.First(&siswa, uint(idUint)).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Siswa dengan ID " + id + " tidak ditemukan"})
+		return
+	}
+
+	// Bind data JSON yang dikirimkan oleh client ke struct siswa
+	if err := c.ShouldBindJSON(&siswa); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Log data siswa yang diterima
+	fmt.Println("Data siswa yang diterima:", siswa)
+
+	// Update siswa ke database
+	if err := database.DB.Save(&siswa).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal mengupdate data siswa"})
+		return
+	}
+
+	// Kirim respons sukses
+	c.JSON(http.StatusOK, gin.H{"message": "Data siswa berhasil diperbarui", "data": siswa})
+}
 
