@@ -2,169 +2,178 @@
   <div>
     <Navbar />
     <div class="container">
-      <h1>Buat Izin</h1>
-
-      <!-- Notifikasi -->
-      <div v-if="izinBerhasil" class="notif-sukses">
-        {{ izinBerhasil }}
+      <div class="form-container">
+        <div class="image-container">
+          <img src="@/images/IZIN.jpg" alt="Izin Illustration" />
+        </div>
+        <div class="form-content">
+          <h1>Buat Izin</h1>
+          <form @submit.prevent="tambahIzin">
+            <input v-model="izinBaru.nama" placeholder="Nama" required />
+            <input v-model="izinBaru.alasan" placeholder="Alasan" required />
+            <select v-model="izinBaru.status" required>
+              <option value="Keluar">Keluar</option>
+              <option value="Masuk">Masuk</option>
+              <option value="Terlambat">Terlambat</option>
+              <option value="Pulang Lebih Cepat">Pulang Lebih Cepat</option>
+              <option value="Ada Urusan Penting">Ada Urusan Penting</option>
+            </select>
+            <button type="submit">Tambah Izin</button>
+          </form>
+        </div>
       </div>
+    </div>
 
-      <!-- Form Tambah Izin -->
-      <form @submit.prevent="tambahIzin">
-        <input v-model="izinBaru.nama" placeholder="Nama" required />
-        <input v-model="izinBaru.alasan" placeholder="Alasan" required />
-        <select v-model="izinBaru.status" required>
-          <option value="Keluar">Keluar</option>
-          <option value="Masuk">Masuk</option>
-          <option value="Terlambat">Terlambat</option>
-        </select>
-        <button type="submit">Tambah Izin</button>
-      </form>
+    <!-- Modal Notifikasi -->
+    <div v-if="showModal" class="modal-overlay">
+      <div class="modal-content">
+        <p>{{ modalMessage }}</p>
+        <button @click="showModal = false">Tutup</button>
+      </div>
     </div>
   </div>
 </template>
-
 
 <script>
 import axios from "axios";
 import Navbar from "../components/Navbar.vue";
 
 export default {
-  components: {
-    Navbar,
-  },
+  components: { Navbar },
   data() {
     return {
-      izins: [],
-      izinBaru: {
-        nama: "",
-        alasan: "",
-        status: "Keluar",
-      },
-      izinBerhasil: "", // ✅ Notifikasi sukses
+      izinBaru: { nama: "", alasan: "", status: "Keluar" },
+      showModal: false,
+      modalMessage: "",
     };
   },
-  async mounted() {
-    await this.fetchIzin();
-  },
   methods: {
-    async fetchIzin() {
-      try {
-        const response = await axios.get("http://localhost:8080/api/izin");
-        this.izins = response.data.data;
-      } catch (error) {
-        console.error("❌ Gagal mengambil data izin:", error);
-      }
-    },
     async tambahIzin() {
       try {
         await axios.post("http://localhost:8080/api/izin", this.izinBaru);
-        this.izinBaru = { nama: "", alasan: "", status: "Keluar" }; // Reset form
-        this.izinBerhasil = "✅ Izin berhasil ditambahkan!"; // ✅ Atur notifikasi sukses
-
-        setTimeout(() => {
-          this.izinBerhasil = ""; // Sembunyikan notifikasi setelah 3 detik
-        }, 3000);
-
-        this.fetchIzin();
+        this.izinBaru = { nama: "", alasan: "", status: "Keluar" };
+        this.modalMessage = "✅ Izin berhasil ditambahkan!";
       } catch (error) {
-        console.error("❌ Gagal menambah izin:", error);
+        this.modalMessage = "❌ Gagal menambahkan izin.";
       }
+      this.showModal = true;
     },
   },
 };
 </script>
 
-
 <style scoped>
-body {
-  font-family: Arial, sans-serif;
-  background: #f4f4f4;
-  color: #333;
-  text-align: center;
-  padding: 20px;
-  margin: 0;
-
-}
-
 .container {
-  background: #fff;
+  max-width: 900px;
+  margin: 120px auto 80px; /* Memberi jarak lebih dari navbar */
   padding: 20px;
+  background: #fff;
   border-radius: 10px;
-  max-width: 500px;
-  margin: 40px auto;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  text-align: center;
-  margin-top: 150px;
-}
-
-h1 {
-  margin-bottom: 20px;
-  font-size: 30px;
-}
-
-form {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 10px;
+  align-items: center;
+  gap: 20px;
 }
 
-input, select, button {
-  width: calc(100% - 20px);
+.form-container {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 30px;
+}
+
+.image-container img {
+  width: 300px;
+  border-radius: 10px;
+}
+
+.form-content {
+  flex: 1;
+  text-align: center;
+}
+
+/* Input dan select dengan efek hover */
+input, select {
+  width: 100%;
   padding: 10px;
+  margin: 10px 0;
   border-radius: 5px;
   border: 1px solid #ccc;
-  font-size: 14px;
-  margin: 0 auto;
+  font-size: 16px;
+  transition: all 0.3s ease-in-out;
 }
 
+input:focus, select:focus {
+  border-color: #8e44ad;
+  box-shadow: 0 0 8px rgba(142, 68, 173, 0.5);
+  transform: scale(1.05);
+}
+
+/* Animasi hover pada tombol */
 button {
-  background: linear-gradient(
-    135deg,
-    #3498db,
-    #8e44ad
-  );
+  width: 100%;
+  padding: 12px;
+  border-radius: 5px;
+  border: none;
+  font-size: 16px;
   color: white;
+  background: linear-gradient(135deg, #3498db, #8e44ad);
   cursor: pointer;
-  font-weight: bold;
-  transition: background 0.3s;
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
 
 button:hover {
-  background: linear-gradient(
-    135deg,
-    #0e6aa8,
-    #601082
-  );
+  transform: scale(1.1);
+  box-shadow: 0 8px 15px rgba(142, 68, 173, 0.3);
 }
 
-table {
-  width: calc(100% - 40px);
-  margin: 20px auto;
-  border-collapse: collapse;
+button:active {
+  transform: scale(1);
+  box-shadow: 0 4px 8px rgba(142, 68, 173, 0.2);
 }
 
-th, td {
-  padding: 12px;
-  border-bottom: 1px solid #ddd;
-  text-align: left;
+/* Modal Styling */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-th {
-  background: #f8f8f8;
-  font-weight: bold;
+.modal-content {
+  background: white;
+  padding: 15px 25px;
+  border-radius: 8px;
+  text-align: center;
+  width: 300px;
+  animation: fadeIn 0.2s ease-in-out;
 }
 
-.status-keluar {
-  color: #d9534f;
+.modal-content p {
+  font-size: 16px;
+  margin-bottom: 20px;
 }
 
-.status-masuk {
-  color: #5cb85c;
+.modal-content button {
+  background-color: #3498db;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
 }
 
-.status-terlambat {
-  color: #f0ad4e;
+.modal-content button:hover {
+  background-color: #8e44ad;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
 }
 </style>

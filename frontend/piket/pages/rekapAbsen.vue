@@ -9,7 +9,12 @@
         <button
           v-for="j in jurusanList"
           :key="j"
-          class="btn btn-primary m-1"
+          class="btn filter-btn m-1"
+          :class="{
+            'btn-success': j === 'PH',
+            'btn-primary': j === 'RPL',
+            'btn-pink': j === 'MPLB'
+          }"
           @click="filterJurusan = (filterJurusan === j) ? null : j">
           {{ j }}
         </button>
@@ -20,7 +25,8 @@
         <button
           v-for="k in kelasList"
           :key="k"
-          class="btn btn-secondary m-1"
+          class="btn filter-btn m-1"
+          :class="getKelasButtonColor(k)"
           @click="filterKelas = (filterKelas === k) ? null : k">
           {{ k }}
         </button>
@@ -48,15 +54,15 @@
           <tr v-for="siswa in filteredSiswa" :key="siswa.id">
             <td>{{ siswa.id }}</td>
             <td>{{ siswa.nis }}</td>
-            <td @click="showModal(siswa)" class="text-primary cursor-pointer nama-siswa">
+            <td @click="showModal(siswa)" class="nama-siswa">
               {{ siswa.nama }}
             </td>
             <td>{{ siswa.jurusan }}</td>
             <td>{{ siswa.kelas }}</td>
-            <td>{{ siswa.jumlahHadir }}</td>
-            <td>{{ siswa.jumlahSakit }}</td>
-            <td>{{ siswa.jumlahIzin }}</td>
-            <td>{{ siswa.jumlahAlfa }}</td>
+            <td :class="'text-success fw-bold'">{{ siswa.jumlahHadir }}</td>
+            <td :class="'text-primary fw-bold'">{{ siswa.jumlahSakit }}</td>
+            <td :class="'text-warning fw-bold'">{{ siswa.jumlahIzin }}</td>
+            <td :class="'text-danger fw-bold'">{{ siswa.jumlahAlfa }}</td>
           </tr>
         </tbody>
       </table>
@@ -90,9 +96,8 @@ export default {
       absensiSiswa: [],
       filterJurusan: null,
       filterKelas: null,
-      // Diubah sesuai permintaan
-      jurusanList: ["RPL", "MPLB", "PH"],  // Diubah jurusannya
-      kelasList: ["10A", "10B", "10C", "11A", "11B", "11C", "12A", "12B", "12C"],  // Filter kelas 10, 11, 12
+      jurusanList: ["RPL", "MPLB", "PH"],
+      kelasList: ["10A", "10B", "10C", "11A", "11B", "11C", "12A", "12B", "12C"],
     };
   },
   computed: {
@@ -144,6 +149,13 @@ export default {
       }
     },
 
+    getKelasButtonColor(kelas) {
+      if (kelas.startsWith("10")) return "btn-success"; // Hijau untuk kelas 10
+      if (kelas.startsWith("11")) return "btn-warning"; // Kuning untuk kelas 11
+      if (kelas.startsWith("12")) return "btn-danger";  // Merah untuk kelas 12
+      return "btn-secondary";
+    },
+
     async showModal(siswa) {
       this.selectedSiswa = siswa;
       this.showModalFlag = true;
@@ -170,20 +182,34 @@ export default {
   margin-bottom: 10px;
 }
 
-.btn {
-  margin-right: 5px;
+/* Efek hover tombol */
+.filter-btn {
+  transition: transform 0.3s ease-in-out, rotate 0.2s;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
 }
 
+.filter-btn:hover {
+  transform: scale(1.12) rotate(3deg);
+  box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Hover Nama Siswa */
 .nama-siswa {
   font-weight: bold;
   font-size: 1.1rem;
   color: #007bff;
   cursor: pointer;
-  transition: color 0.3s;
+  transition: transform 0.3s ease-in-out;
 }
 
 .nama-siswa:hover {
-  color: #0056b3;
-  text-decoration: none;
+  color: #ff4500;
+  transform: scale(1.2);
 }
+
+/* Warna absensi */
+.text-success { color: #28a745 !important; }
+.text-primary { color: #007bff !important; }
+.text-warning { color: #ffc107 !important; }
+.text-danger { color: #dc3545 !important; }
 </style>
