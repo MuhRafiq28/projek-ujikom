@@ -7,22 +7,13 @@
         <p class="text-danger">Tidak ada data absensi yang tersedia untuk siswa ini.</p>
       </div>
 
-      <table v-else class="table table-bordered">
-        <thead>
-          <tr>
-            <th>No</th>
-            <th>Tanggal</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(rekap, index) in absensi" :key="rekap.id">
-            <td>{{ index + 1 }}</td>
-            <td>{{ formatDate(rekap.tanggal) }}</td>
-            <td>{{ rekap.status }}</td>
-          </tr>
-        </tbody>
-      </table>
+      <div v-else class="absensi-container">
+        <div v-for="(rekap, index) in absensi" :key="rekap.id" class="absensi-card">
+          <p class="nomor">{{ index + 1 }}</p>
+          <p class="tanggal">{{ formatDate(rekap.tanggal) }}</p>
+          <p :class="['status', getStatusClass(rekap.status)]">{{ rekap.status }}</p>
+        </div>
+      </div>
 
       <button class="btn btn-secondary mt-3" @click="$emit('close')">Tutup</button>
     </div>
@@ -55,7 +46,6 @@ export default {
       try {
         const response = await axios.get(`http://localhost:8080/api/rekap-absensi/nama/${encodeURIComponent(this.siswa.nama)}`);
 
-        // Debugging: Cek isi response dari API
         console.log("Data absensi siswa:", response.data);
 
         if (response.data.status === "success" && Array.isArray(response.data.data)) {
@@ -77,6 +67,20 @@ export default {
         month: "numeric",
         day: "numeric"
       });
+    },
+    getStatusClass(status) {
+      switch (status.toLowerCase()) {
+        case 'sakit':
+          return 'sakit'; // Kelas untuk status sakit
+        case 'izin':
+          return 'izin'; // Kelas untuk status izin
+        case 'alfa':
+          return 'alfa'; // Kelas untuk status alfa
+        case 'hadir':
+          return 'hadir'; // Kelas untuk status hadir
+        default:
+          return ''; // Default kosong jika status tidak dikenali
+      }
     }
   }
 };
@@ -99,10 +103,62 @@ export default {
   background: white;
   padding: 20px;
   border-radius: 8px;
-  width: 450px;
+  width: 700px; /* Modal lebih lebar */
 }
 
 .text-danger {
   color: red;
+}
+
+/* Tampilan absensi dalam bentuk grid */
+.absensi-container {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr); /* 5 kolom */
+  gap: 10px;
+  max-height: 400px; /* Sesuaikan dengan ukuran yang diinginkan */
+  overflow-y: auto; /* Agar bisa scroll ke bawah jika data lebih banyak */
+}
+
+.absensi-card {
+  background: #f8f9fa;
+  padding: 10px;
+  border-radius: 6px;
+  text-align: center;
+  min-height: 100px; /* Tentukan tinggi minimum untuk setiap card */
+}
+
+.nomor {
+  font-weight: bold;
+}
+
+.tanggal {
+  font-size: 0.9em;
+  color: #555;
+}
+
+.status {
+  font-size: 1em;
+  font-weight: bold;
+  padding: 5px;
+  border-radius: 5px;
+  color: white; /* Teks warna putih untuk kontras */
+}
+
+/* Warna berdasarkan status */
+.sakit {
+  background-color: blue;
+}
+
+.izin {
+  background-color: yellow;
+  color: black; /* Warna teks hitam untuk kontras dengan latar belakang kuning */
+}
+
+.alfa {
+  background-color: red;
+}
+
+.hadir {
+  background-color: green;
 }
 </style>

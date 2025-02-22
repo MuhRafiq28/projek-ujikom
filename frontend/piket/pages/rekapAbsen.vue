@@ -36,7 +36,7 @@
       <table class="table table-striped table-bordered">
         <thead>
           <tr>
-            <th>ID</th>
+            <th>No</th>
             <th>NIS</th>
             <th>Nama</th>
             <th>Jurusan</th>
@@ -51,18 +51,18 @@
           <tr v-if="filteredSiswa.length === 0">
             <td colspan="9" class="text-center">Tidak ada data siswa</td>
           </tr>
-          <tr v-for="siswa in filteredSiswa" :key="siswa.id">
-            <td>{{ siswa.id }}</td>
+          <tr v-for="(siswa, index) in filteredSiswa" :key="siswa.id">
+            <td>{{ index + 1 }}</td>
             <td>{{ siswa.nis }}</td>
             <td @click="showModal(siswa)" class="nama-siswa">
               {{ siswa.nama }}
             </td>
             <td>{{ siswa.jurusan }}</td>
             <td>{{ siswa.kelas }}</td>
-            <td :class="'text-success fw-bold'">{{ siswa.jumlahHadir }}</td>
-            <td :class="'text-primary fw-bold'">{{ siswa.jumlahSakit }}</td>
-            <td :class="'text-warning fw-bold'">{{ siswa.jumlahIzin }}</td>
-            <td :class="'text-danger fw-bold'">{{ siswa.jumlahAlfa }}</td>
+            <td :class="'bg-hadir text-success fw-bold'">{{ siswa.jumlahHadir }}</td>
+            <td :class="'bg-sakit text-primary fw-bold'">{{ siswa.jumlahSakit }}</td>
+            <td :class="'bg-izin text-warning fw-bold'">{{ siswa.jumlahIzin }}</td>
+            <td :class="'bg-alfa text-danger fw-bold'">{{ siswa.jumlahAlfa }}</td>
           </tr>
         </tbody>
       </table>
@@ -77,6 +77,7 @@
     </div>
   </div>
 </template>
+
 
 <script>
 import RekapAbsensiModal from "@/components/RekapAbsensiModal.vue";
@@ -178,11 +179,59 @@ export default {
   margin-top: 90px;
 }
 
-.filter-container {
-  margin-bottom: 10px;
+/* Styling tabel */
+.table {
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+  background: white;
 }
 
-/* Efek hover tombol */
+/* Header tabel */
+.table thead {
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  color: white;
+  font-size: 1rem;
+  text-transform: uppercase;
+}
+
+/* Warna background untuk kategori absensi */
+.bg-hadir {
+  background-color: rgba(40, 167, 69, 0.2); /* Hijau lembut */
+}
+
+.bg-sakit {
+  background-color: rgba(0, 123, 255, 0.2); /* Biru lembut */
+}
+
+.bg-izin {
+  background-color: rgba(255, 193, 7, 0.2); /* Kuning lembut */
+}
+
+.bg-alfa {
+  background-color: rgba(220, 53, 69, 0.2); /* Merah lembut */
+}
+
+/* Hover efek untuk baris */
+.table tbody tr {
+  transition: background 0.3s ease-in-out, transform 0.2s;
+}
+
+.table tbody tr:hover {
+  background: rgba(0, 123, 255, 0.1);
+  transform: scale(1.02);
+}
+
+/* Styling untuk sel */
+.table td, .table th {
+  padding: 12px;
+  text-align: center;
+  border-bottom: 2px solid #dee2e6;
+}
+
+/* Efek hover tombol filter */
 .filter-btn {
   transition: transform 0.3s ease-in-out, rotate 0.2s;
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
@@ -207,9 +256,30 @@ export default {
   transform: scale(1.2);
 }
 
-/* Warna absensi */
-.text-success { color: #28a745 !important; }
-.text-primary { color: #007bff !important; }
-.text-warning { color: #ffc107 !important; }
-.text-danger { color: #dc3545 !important; }
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1050; /* Lebih tinggi dari navbar */
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 600px;
+  z-index: 1051; /* Pastikan modal tetap di atas overlay */
+}
+
+.text-danger {
+  color: red;
+}
 </style>
+
+
