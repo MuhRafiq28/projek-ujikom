@@ -1,20 +1,20 @@
 <template>
   <div>
-    <Navbar />
-  <div class="home-user">
-    <h1>Welcome to Home Peetugas Page</h1>
-    <!-- Add your content here -->
+    <NavAdmin />
+    <div class="home-user">
+      <h1>Welcome to Home Petugas Page</h1>
+      <!-- Add your content here -->
+    </div>
   </div>
-</div>
 </template>
 
 <script>
-import Navbar from '~/components/Navbar.vue';
+import NavAdmin from '../components/NavAdmin.vue'; // Pastikan path ini benar
 
 export default {
   name: 'HomeUser',
-  comments: {
-    Navbar
+  components: {
+    NavAdmin, // Menggunakan components dengan benar
   },
   data() {
     return {

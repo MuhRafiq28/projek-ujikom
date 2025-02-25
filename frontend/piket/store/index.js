@@ -18,3 +18,5 @@ export const actions = {
     commit("SET_ROLE", role);
   },
 };
+export const strict = false;
+

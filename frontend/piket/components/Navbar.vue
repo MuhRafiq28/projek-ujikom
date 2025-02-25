@@ -26,6 +26,19 @@
           </li>
         </ul>
       </li>
+      <li class="dropdown">
+        <button class="menu-item dropdown-toggle" @click="toggleDropdown('absensiDropdown')">
+          <i class="fas fa-clipboard-check"></i> IZIN <i ></i>
+        </button>
+        <ul v-show="activeDropdown === 'absensiDropdown'" class="dropdown-menu">
+          <li>
+            <nuxt-link to="/ijin-siswa" class="menu-item">Buat Ijin</nuxt-link>
+          </li>
+          <li>
+            <nuxt-link to="/daftar-ijin" class="menu-item">Daftar Ijin</nuxt-link>
+          </li>
+        </ul>
+      </li>
       <li v-for="menu in menus" :key="menu.name">
         <nuxt-link :to="menu.link" class="menu-item">
           <i :class="menu.icon"></i> {{ menu.name }}
@@ -63,7 +76,7 @@ export default {
     menus() {
       const baseMenus = [
         { name: "Jadwal Guru Piket", link: "/jadwalGuru", icon: "fas fa-calendar-alt" },
-        { name: "Daftar Ijin", link: "/daftar-ijin", icon: "fas fa-history" },
+  
       ];
 
       if (this.userRole === "admin") {
@@ -73,8 +86,6 @@ export default {
         );
       }
 
-      baseMenus.push({ name: "Ijin", link: "/ijin-siswa", icon: "fas fa-clipboard-check" });
-      return baseMenus;
     },
   },
   methods: {

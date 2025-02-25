@@ -1,6 +1,7 @@
 <template>
   <div>
-    <Navbar />
+    <NavAdmin v-if="userRole === 'admin'" />
+    <Navbar v-else />
     <div class="schedule-container">
       <h2>Semua Jadwal</h2>
 
@@ -38,11 +39,13 @@
 import axios from "axios";
 import ModalJadwal from '@/components/ModalJadwal.vue';
 import Navbar from '@/components/Navbar.vue';
+import NavAdmin from "../components/NavAdmin.vue";
 
 export default {
   components: {
     ModalJadwal,
-    Navbar
+    Navbar,
+    NavAdmin
   },
   data() {
     return {
@@ -119,6 +122,11 @@ export default {
         console.error("Error deleting schedule:", error);
       }
     },
+    async mounted() {
+    await this.fetchGurus();
+    this.userRole = localStorage.getItem('userRole') || 'user';
+ // Ambil peran pengguna dari localStorage
+  },
   }
 };
 </script>

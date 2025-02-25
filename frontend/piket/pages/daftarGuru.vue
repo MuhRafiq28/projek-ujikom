@@ -1,66 +1,76 @@
 <template>
-  <div>
-  <Navbar />
-  <div class="container">
-    <h1 class="title">Daftar Guru</h1>
+  <div class="admin-container">
+    <!-- Sidebar untuk Admin -->
+    <NavAdmin v-if="userRole === 'admin'" class="sidebar" />
 
-    <!-- Tombol Tambah Guru (Hanya untuk Admin) -->
-    <div class="button-container" v-if="userRole === 'admin'">
-      <button @click="openModal" class="button add-button">
-        + Tambah Guru
-      </button>
+    <!-- Kontainer Utama -->
+    <div :class="userRole === 'admin' ? 'main-content admin-layout' : 'main-content user-layout'">
+      <!-- Navbar untuk User -->
+      <Navbar v-if="userRole !== 'admin'" />
+
+      <div class="content">
+        <h1 class="title">Daftar Guru</h1>
+
+        <!-- Tombol Tambah Guru (Hanya untuk Admin) -->
+        <div class="button-container" v-if="userRole === 'admin'">
+          <button @click="openModal" class="button add-button">
+            + Tambah Guru
+          </button>
+        </div>
+
+        <!-- Tabel Daftar Guru -->
+        <div class="table-container">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nama</th>
+                <th>Kode Guru</th>
+                <th>Mapel Guru</th>
+                <th v-if="userRole === 'admin'">Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="guru in gurus" :key="guru.id" class="table-row">
+                <td>{{ guru.id }}</td>
+                <td>{{ guru.nama }}</td>
+                <td>{{ guru.kodeguru }}</td>
+                <td>{{ guru.mapelguru }}</td>
+                <td class="action-buttons" v-if="userRole === 'admin'">
+                  <button @click="editGuru(guru)" class="button edit-button">
+                    ✏️ Edit
+                  </button>
+                  <button @click="deleteGuru(guru.id)" class="button delete-button">
+                    🗑 Hapus
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p v-if="gurus.length === 0" class="no-data">Data guru tidak ditemukan.</p>
+
+        <!-- Modal CRUD -->
+        <ModalGuru
+          :show="showModal"
+          :isEdit="isEdit"
+          :guruData="guruForm"
+          @submit="handleSubmit"
+          @close="closeModal"
+        />
+      </div>
     </div>
-
-    <!-- Tabel Daftar Guru -->
-    <div class="table-container">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Nama</th>
-            <th>Kode Guru</th>
-            <th>Mapel Guru</th>
-            <th v-if="userRole === 'admin'">Aksi</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="guru in gurus" :key="guru.id" class="table-row">
-            <td>{{ guru.id }}</td>
-            <td>{{ guru.nama }}</td>
-            <td>{{ guru.kodeguru }}</td>
-            <td>{{ guru.mapelguru }}</td>
-            <td class="action-buttons" v-if="userRole === 'admin'">
-              <button @click="editGuru(guru)" class="button edit-button">
-                ✏️ Edit
-              </button>
-              <button @click="deleteGuru(guru.id)" class="button delete-button">
-                🗑 Hapus
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <p v-if="gurus.length === 0" class="no-data">Data guru tidak ditemukan.</p>
-
-    <!-- Modal CRUD -->
-    <ModalGuru
-      :show="showModal"
-      :isEdit="isEdit"
-      :guruData="guruForm"
-      @submit="handleSubmit"
-      @close="closeModal"
-    />
   </div>
-</div>
 </template>
 
 <script>
 import ModalGuru from '@/components/ModalGuru.vue';
 import Navbar from '@/components/Navbar.vue';
+import NavAdmin from '@/components/NavAdmin.vue';
+
 export default {
-  components: { ModalGuru, Navbar },
+  components: { ModalGuru, Navbar, NavAdmin },
   data() {
     return {
       gurus: [],
@@ -78,7 +88,6 @@ export default {
   async mounted() {
     await this.fetchGurus();
     this.userRole = localStorage.getItem('userRole') || 'user';
- // Ambil peran pengguna dari localStorage
   },
   methods: {
     async fetchGurus() {
@@ -141,26 +150,71 @@ export default {
 </script>
 
 <style scoped>
-template {
-  background: #757171;
-}
-.container {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 24px;
-  background-color: #f9fafb;
-  border-radius: 12px;
-  margin-top: 60px;
+/* Container utama */
+.admin-container {
+  display: flex;
+  min-height: 100vh;
 }
 
+/* Sidebar (hanya untuk admin) */
+.sidebar {
+  width: 250px;
+  height: 100vh;
+  background-color: #3800bb;
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  padding: 20px;
+  color: white;
+}
+
+/* Main Content Layout */
+.main-content {
+  flex-grow: 1;
+  transition: margin-left 0.3s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Layout untuk Admin (Sidebar aktif) */
+.admin-layout {
+  margin-left: 250px;
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Layout untuk User */
+.user-layout {
+  margin-top: 70px; /* User konten lebih turun */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Konten */
+.content {
+  width: 80%;
+  max-width: 900px;
+  background-color: #f9fafb;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+/* Judul */
 .title {
   font-size: 2.25rem;
   font-weight: 600;
-  text-align: center;
   color: #333;
-  margin-bottom: 32px;
+  margin-bottom: 15px;
 }
 
+/* Button */
 .button-container {
   display: flex;
   justify-content: flex-end;
@@ -189,6 +243,7 @@ template {
   transform: translateY(-2px);
 }
 
+/* Tabel */
 .table-container {
   overflow-x: auto;
   background-color: white;
@@ -225,47 +280,7 @@ th {
   background-color: #f1f5f9;
 }
 
-.action-buttons {
-  text-align: center;
-}
-
-.edit-button {
-  background: linear-gradient(
-    135deg,
-    #3498db,
-    #8e44ad
-  );
-  color: white;
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.edit-button:hover {
-  background-color: #f59e0b;
-  transform: translateY(-2px);
-}
-
-.delete-button {
-  background: linear-gradient(
-    135deg,
-    #3498db,
-    #8e44ad
-  );
-  color: white;
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  margin-left: 8px;
-}
-
-.delete-button:hover {
-  background-color: #dc2626;
-  transform: translateY(-2px);
-}
-
+/* Pesan Data Kosong */
 .no-data {
   text-align: center;
   color: #6b7280;

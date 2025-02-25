@@ -1,13 +1,13 @@
 <template>
   <div :class="userRole === 'admin' ? 'admin-layout' : 'user-layout'">
     <NavAdmin v-if="userRole === 'admin'" />
-    <Navbar v-else />
+    <div class="main-content">
+      <Navbar v-if="userRole !== 'admin'" />
 
-    <div class="content">
       <div class="container">
         <h2 class="title">Absensi Siswa</h2>
 
-        <!-- Filter Dropdown for Jurusan and Kelas -->
+        <!-- Filter Dropdown for Jurusan dan Kelas -->
         <div class="filter-container">
           <select v-model="selectedKelas" @change="fetchSiswa" class="form-select">
             <option value="">Semua Kelas</option>
@@ -127,15 +127,25 @@ onMounted(() => {
   display: flex;
 }
 
-.admin-layout .content {
+.admin-layout .main-content {
   margin-left: 250px; /* Geser konten ke kanan */
   width: calc(100% - 250px);
   padding: 20px;
 }
 
 /* Layout untuk User */
-.user-layout .content {
+.user-layout .main-content {
   margin-top: 80px; /* Pastikan tidak tertutup navbar */
+  padding: 20px;
+}
+
+/* Sidebar Styling */
+.sidebar {
+  width: 250px;
+  height: 100vh;
+  background: #343a40;
+  color: white;
+  position: fixed;
   padding: 20px;
 }
 

@@ -9,7 +9,6 @@
         <p class="instruction">
           Saat membuat izin, harap lebih teliti dan pastikan siswa tidak berbohong serta memiliki alasan yang masuk akal.
         </p>
-       
       </div>
       <div class="image">
         <img src="@/images/smkn.png" alt="SMKN 1 Cisarua">
@@ -40,6 +39,27 @@ import Navbar from "../components/Navbar.vue";
 export default {
   async mounted() {
     await this.$store.dispatch("fetchUserRole");
+
+    if (typeof window !== "undefined") {
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        // Jika tidak ada token, arahkan ke halaman login
+        this.$router.push("/login");
+      } else {
+        const userRole = localStorage.getItem("userRole");
+
+        if (userRole === "admin") {
+          // Arahkan ke halaman home-staf jika role admin
+          this.$router.push("/home-staf");
+        }
+
+        // Set user role ke data
+        this.userRole = userRole || "user";
+      }
+
+      // Tambahkan event listener untuk mengupdate role jika ada perubahan
+      window.addEventListener("storage", this.updateUserRole);
+    }
   },
   components: { Navbar },
   name: "HomePage",
@@ -47,16 +67,6 @@ export default {
     return {
       userRole: "user",
     };
-  },
-  mounted() {
-    if (typeof window !== "undefined") {
-      const token = localStorage.getItem("authToken");
-      if (!token) {
-        this.$router.push("/login");
-      }
-      this.userRole = localStorage.getItem("userRole") || "user";
-      window.addEventListener("storage", this.updateUserRole);
-    }
   },
   methods: {
     updateUserRole() {

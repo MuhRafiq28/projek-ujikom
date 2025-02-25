@@ -1,6 +1,7 @@
 <template>
   <div>
-    <Navbar />
+    <NavAdmin v-if="userRole === 'admin'" />
+    <Navbar v-else />
     <div class="container">
       <h1>Daftar Siswa</h1>
 
@@ -83,11 +84,13 @@
 import RekapAbsensiModal from "@/components/RekapAbsensiModal.vue";
 import Navbar from "../components/Navbar.vue";
 import axios from "axios";
+import NavAdmin from "../components/NavAdmin.vue";
 
 export default {
   components: {
     RekapAbsensiModal,
     Navbar,
+    NavAdmin
   },
   data() {
     return {
@@ -113,6 +116,10 @@ export default {
   },
   created() {
     this.fetchAllSiswa();
+  },
+  mounted() {
+    // Ambil peran user dari localStorage
+    this.userRole = localStorage.getItem("userRole") || "user";
   },
   methods: {
     async fetchAllSiswa() {

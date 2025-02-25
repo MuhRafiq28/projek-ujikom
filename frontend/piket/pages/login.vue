@@ -37,10 +37,10 @@ export default {
 
         console.log("Response dari API:", response.data);
 
-        // Ambil data yang dikembalikan oleh backend
+        // Ambil data dari backend
         const { token, id, role, username } = response.data;
 
-        if (token) {
+        if (token && role) {
           // Simpan data pengguna ke localStorage
           localStorage.setItem('authToken', token);
           localStorage.setItem('userId', id);
@@ -52,16 +52,20 @@ export default {
 
           console.log("User data stored:", { token, id, role, username });
 
-          // Redirect ke halaman berdasarkan role
-          if (role === 'admin') {
-            this.$router.push('/home-admin');
-          } else if (role === 'staf') {
-            this.$router.push('/home-staf');
-          } else {
-            this.$router.push('/home');
+          // Redirect sesuai role
+          switch (role.toLowerCase()) {
+            case 'admin':
+              this.$router.push('/home-admin');
+              break;
+            case 'user':
+              this.$router.push('/home');
+              break;
+            default:
+              alert('Role tidak dikenali!');
+              this.$router.push('/home'); // Default ke home
           }
         } else {
-          alert('Login gagal, token tidak ditemukan.');
+          alert('Login gagal, token atau role tidak ditemukan.');
         }
       } catch (error) {
         console.error("Login error:", error.response?.data || error.message);

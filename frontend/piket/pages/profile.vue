@@ -1,33 +1,70 @@
 <template>
-  <div class="profile">
-    <Navbar />
-    <div class="profile-page">
-      <h1>Profil Pengguna</h1>
-      <div class="profile-info">
-        <div class="profile-item">
-          <label for="username">Nama Pengguna:</label>
-          <input v-model="profile.username" type="text" id="username" disabled />
-        </div>
-        <div class="profile-item">
-          <label for="email">Email:</label>
-          <input v-model="profile.email" type="email" id="email" />
-        </div>
-        <div class="profile-item">
-          <label for="role">Peran:</label>
-          <input v-model="profile.role" type="text" id="role" disabled />
+  <div>
+    <!-- Layout Admin -->
+    <div class="admin-layout" v-if="isAdmin">
+      <!-- Navbar Admin -->
+      <NavAdmin />
+      <!-- Container Profil untuk Admin -->
+      <div class="profile-container-admin">
+        <div class="profile-page">
+          <h1>Profil Pengguna</h1>
+          <div class="profile-info">
+            <div class="profile-item">
+              <label for="username">Nama Pengguna:</label>
+              <input v-model="profile.username" type="text" id="username" disabled />
+            </div>
+            <div class="profile-item">
+              <label for="email">Email:</label>
+              <input v-model="profile.email" type="email" id="email" />
+            </div>
+            <div class="profile-item">
+              <label for="role">Peran:</label>
+              <input v-model="profile.role" type="text" id="role" disabled />
+            </div>
+          </div>
+          <button @click="saveProfile" class="save-btn">Simpan Perubahan</button>
+          <button @click="logout" class="logout-btn">Logout</button>
         </div>
       </div>
-      <button @click="saveProfile" class="save-btn">Simpan Perubahan</button>
-      <button @click="logout" class="logout-btn">Logout</button> <!-- Tombol logout -->
+    </div>
+
+    <!-- Layout User (Navbar biasa) -->
+    <div v-else>
+      <Navbar />
+      <div class="profile-container">
+        <div class="profile-page">
+          <h1>Profil Pengguna</h1>
+          <div class="profile-info">
+            <div class="profile-item">
+              <label for="username">Nama Pengguna:</label>
+              <input v-model="profile.username" type="text" id="username" disabled />
+            </div>
+            <div class="profile-item">
+              <label for="email">Email:</label>
+              <input v-model="profile.email" type="email" id="email" />
+            </div>
+            <div class="profile-item">
+              <label for="role">Peran:</label>
+              <input v-model="profile.role" type="text" id="role" disabled />
+            </div>
+          </div>
+          <button @click="saveProfile" class="save-btn">Simpan Perubahan</button>
+          <button @click="logout" class="logout-btn">Logout</button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import Navbar from '~/components/Navbar.vue';
+import NavAdmin from '~/components/NavAdmin.vue';
 
 export default {
-  components: { Navbar },
+  components: {
+    Navbar,
+    NavAdmin
+  },
   data() {
     return {
       profile: {
@@ -37,9 +74,16 @@ export default {
       },
     };
   },
+  computed: {
+    isAdmin() {
+      if (process.client) {
+        return localStorage.getItem('userRole') === 'admin';
+      }
+      return false;
+    }
+  },
   mounted() {
-    // Memastikan kode ini hanya dijalankan di sisi klien
-    if (typeof window !== 'undefined' && window.localStorage) {
+    if (process.client) {
       this.profile.username = localStorage.getItem('username') || '';
       this.profile.email = localStorage.getItem('userEmail') || '';
       this.profile.role = localStorage.getItem('userRole') || '';
@@ -47,35 +91,52 @@ export default {
   },
   methods: {
     saveProfile() {
-      // Simulasi penyimpanan data baru (misalnya, kirim ke API)
-      if (typeof window !== 'undefined' && window.localStorage) {
+      if (process.client) {
         localStorage.setItem('userEmail', this.profile.email);
       }
       alert("Profil berhasil diperbarui!");
     },
     logout() {
-      console.log("Logout dipanggil"); // Debug log
-      localStorage.removeItem("authToken");
-      localStorage.removeItem("userId");
-      localStorage.removeItem("userRole");
-      localStorage.removeItem("username");
-      console.log("Token setelah logout:", localStorage.getItem("authToken")); // Debug log
-      this.$router.push("/landing"); // Redirect ke halaman login
+      if (process.client) {
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("userId");
+        localStorage.removeItem("userRole");
+        localStorage.removeItem("username");
+      }
+      this.$router.push("/landing");
     },
   },
 };
 </script>
 
 <style scoped>
+/* Layout utama dengan flexbox */
+.admin-layout {
+  display: flex;
+  height: 100vh;
+}
+
+/* Profile Container untuk Admin Layout */
+.profile-container-admin {
+  flex: 1;
+  padding: 40px;
+
+  display: flex;
+
+  align-items: center;
+  margin-left: 200px; /* Memberikan jarak agar profil tidak mepet navbar */
+}
+
 .profile-page {
+  width: 100%;
   max-width: 600px;
-  margin: 50px auto;
   padding: 20px;
-  background-color: #f8f9fa;
+  background-color: white;
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
+/* Styling teks dan input */
 h1 {
   font-size: 2em;
   margin-bottom: 20px;
@@ -107,14 +168,10 @@ input {
   box-sizing: border-box;
 }
 
+/* Tombol simpan */
 button.save-btn {
   padding: 10px 20px;
-
-  background: linear-gradient(
-    135deg,
-    #3498db,
-    #8e44ad
-  );
+  background: linear-gradient(135deg, #3498db, #8e44ad);
   color: white;
   border: none;
   border-radius: 5px;
@@ -128,14 +185,10 @@ button.save-btn:hover {
   background-color: #2980b9;
 }
 
+/* Tombol logout */
 button.logout-btn {
   padding: 10px 20px;
-
-  background: linear-gradient(
-    135deg,
-    #b434db,
-    #e10000
-  );
+  background: linear-gradient(135deg, #b434db, #e10000);
   color: white;
   border: none;
   border-radius: 5px;
@@ -147,5 +200,16 @@ button.logout-btn {
 
 button.logout-btn:hover {
   background-color: #c0392b;
+}
+
+/* Profile Container untuk User Layout */
+.profile-container {
+  margin-top: 80px;
+  flex: 1;
+  padding: 40px;
+  background-color: #f8f9fa;
+  display: flex;
+  justify-content: center; /* Menjaga konten berada di tengah */
+  align-items: center;
 }
 </style>

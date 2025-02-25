@@ -1,6 +1,9 @@
 <template>
   <div>
-    <Navbar />
+    <!-- Navbar admin jika userRole adalah admin -->
+    <NavAdmin v-if="userRole === 'admin'" />
+    <Navbar v-else />
+
     <div class="container">
       <div class="card">
         <div class="form-container">
@@ -44,9 +47,12 @@
 <script>
 import axios from "axios";
 import Navbar from "~/components/Navbar.vue";
+import NavAdmin from "../components/NavAdmin.vue";
+
 export default {
   components: {
-    Navbar
+    Navbar,
+    NavAdmin,
   },
   data() {
     return {
@@ -55,8 +61,13 @@ export default {
       message: "",
       error: "",
       showSuccessModal: false,
-      showErrorModal: false
+      showErrorModal: false,
+      userRole: "user", // Default userRole
     };
+  },
+  mounted() {
+    // Ambil peran user dari localStorage
+    this.userRole = localStorage.getItem("userRole") || "user";
   },
   methods: {
     async register() {
@@ -82,8 +93,8 @@ export default {
     closeModal() {
       this.showSuccessModal = false;
       this.showErrorModal = false;
-    }
-  }
+    },
+  },
 };
 </script>
 
