@@ -24,6 +24,14 @@ export default {
     'bootstrap/dist/css/bootstrap.min.css',
   ],
 
+  buildModules: [
+    '@nuxtjs/composition-api/module',
+  ],
+
+  plugins: [
+    { src: "~/plugins/toast.js", mode: "client" },
+  ],
+
   modules: [
     '@nuxtjs/axios',
     'bootstrap-vue/nuxt',
@@ -35,3 +43,5 @@ export default {
 
   build: {},
 }
+
+

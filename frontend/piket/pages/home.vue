@@ -11,7 +11,7 @@
         </p>
       </div>
       <div class="image">
-        <img src="@/images/smkn.png" alt="SMKN 1 Cisarua">
+        <img src="@/images/smkn.png" alt="SMKN 1 Cisarua" />
       </div>
     </div>
 
@@ -37,30 +37,6 @@
 import Navbar from "../components/Navbar.vue";
 
 export default {
-  async mounted() {
-    await this.$store.dispatch("fetchUserRole");
-
-    if (typeof window !== "undefined") {
-      const token = localStorage.getItem("authToken");
-      if (!token) {
-        // Jika tidak ada token, arahkan ke halaman login
-        this.$router.push("/login");
-      } else {
-        const userRole = localStorage.getItem("userRole");
-
-        if (userRole === "admin") {
-          // Arahkan ke halaman home-staf jika role admin
-          this.$router.push("/home-staf");
-        }
-
-        // Set user role ke data
-        this.userRole = userRole || "user";
-      }
-
-      // Tambahkan event listener untuk mengupdate role jika ada perubahan
-      window.addEventListener("storage", this.updateUserRole);
-    }
-  },
   components: { Navbar },
   name: "HomePage",
   data() {
@@ -70,8 +46,17 @@ export default {
   },
   methods: {
     updateUserRole() {
-      this.userRole = localStorage.getItem("userRole");
+      const role = localStorage.getItem("userRole");
+      if (role) {
+        this.userRole = role;
+      }
     },
+  },
+  mounted() {
+    if (typeof window !== "undefined") {
+      this.updateUserRole();
+      window.addEventListener("storage", this.updateUserRole);
+    }
   },
   beforeDestroy() {
     if (typeof window !== "undefined") {

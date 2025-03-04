@@ -1,54 +1,50 @@
 <template>
-  <div :class="userRole === 'admin' ? 'admin-layout' : 'user-layout'">
-    <NavAdmin v-if="userRole === 'admin'" />
-    <Navbar v-else />
+  <div>
+    <Navbar />
+    <div class="container">
+      <h2 class="title">Absensi Siswa</h2>
 
-    <div class="content">
-      <div class="container">
-        <h2 class="title">Absensi Siswa</h2>
-
-        <!-- Filter Dropdown for Jurusan and Kelas -->
-        <div class="filter-container">
-          <select v-model="selectedKelas" @change="fetchSiswa" class="form-select">
-            <option value="">Semua Kelas</option>
-            <option v-for="kelas in kelasList" :key="kelas" :value="kelas">{{ kelas }}</option>
-          </select>
-          <select v-model="selectedJurusan" @change="fetchSiswa" class="form-select">
-            <option value="">Semua Jurusan</option>
-            <option v-for="jurusan in jurusanList" :key="jurusan" :value="jurusan">{{ jurusan }}</option>
-          </select>
-        </div>
-
-        <table class="table">
-          <thead>
-            <tr>
-              <th>No.</th>
-              <th>Nama Siswa</th>
-              <th>Kelas</th>
-              <th>Jurusan</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(absensi, index) in filteredAbsensi" :key="index">
-              <td>{{ index + 1 }}</td>
-              <td>{{ absensi.nama }}</td>
-              <td>{{ absensi.kelas }}</td>
-              <td>{{ absensi.jurusan }}</td>
-              <td>
-                <select v-model="absensi.status" class="form-select" :class="getStatusClass(absensi.status)">
-                  <option value="Hadir">Hadir</option>
-                  <option value="Sakit">Sakit</option>
-                  <option value="Izin">Izin</option>
-                  <option value="Alfa">Alfa</option>
-                </select>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-
-        <button @click="submitAbsensi" class="btn-submit">Simpan Absensi</button>
+      <!-- Filter Dropdown for Jurusan and Kelas -->
+      <div class="filter-container">
+        <select v-model="selectedKelas" @change="fetchSiswa" class="form-select">
+          <option value="">Semua Kelas</option>
+          <option v-for="kelas in kelasList" :key="kelas" :value="kelas">{{ kelas }}</option>
+        </select>
+        <select v-model="selectedJurusan" @change="fetchSiswa" class="form-select">
+          <option value="">Semua Jurusan</option>
+          <option v-for="jurusan in jurusanList" :key="jurusan" :value="jurusan">{{ jurusan }}</option>
+        </select>
       </div>
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th>No.</th>
+            <th>Nama Siswa</th>
+            <th>Kelas</th>
+            <th>Jurusan</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(absensi, index) in filteredAbsensi" :key="index">
+            <td>{{ index + 1 }}</td>
+            <td>{{ absensi.nama }}</td>
+            <td>{{ absensi.kelas }}</td>
+            <td>{{ absensi.jurusan }}</td>
+            <td>
+              <select v-model="absensi.status" class="form-select" :class="getStatusClass(absensi.status)">
+                <option value="Hadir">Hadir</option>
+                <option value="Sakit">Sakit</option>
+                <option value="Izin">Izin</option>
+                <option value="Alfa">Alfa</option>
+              </select>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <button @click="submitAbsensi" class="btn-submit">Simpan Absensi</button>
     </div>
   </div>
 </template>
@@ -57,17 +53,14 @@
 import { ref, computed, onMounted } from 'vue';
 import axios from 'axios';
 import Navbar from '../components/Navbar.vue';
-import NavAdmin from '../components/NavAdmin.vue';
 
-// State
 const absensiList = ref([]);
 const kelasList = ['10A', '10B', '10C', '11A', '11B', '11C', '12A', '12B', '12C'];
 const jurusanList = ['RPL', 'MPLB', 'PH'];
-const selectedKelas = ref('');
-const selectedJurusan = ref('');
-const userRole = ref('');
+let selectedKelas = ref('');
+let selectedJurusan = ref('');
 
-// Fetch data siswa
+// Ambil daftar siswa dan set default status Hadir
 const fetchSiswa = async () => {
   try {
     const response = await axios.get('http://localhost:8080/api/siswa');
@@ -76,15 +69,15 @@ const fetchSiswa = async () => {
       nama: siswa.nama,
       kelas: siswa.kelas,
       jurusan: siswa.jurusan,
-      status: 'Hadir',
-      tanggal: new Date().toISOString().split('T')[0],
+      status: 'Hadir', // Default status diubah ke Hadir
+      tanggal: new Date().toISOString().split('T')[0], // Set tanggal otomatis
     }));
   } catch (error) {
     console.error('Error fetching siswa:', error);
   }
 };
 
-// Filter absensi berdasarkan kelas dan jurusan
+// Filter absensiList berdasarkan kelas dan jurusan
 const filteredAbsensi = computed(() => {
   return absensiList.value.filter(siswa => {
     const matchesKelas = !selectedKelas.value || siswa.kelas === selectedKelas.value;
@@ -93,7 +86,7 @@ const filteredAbsensi = computed(() => {
   });
 });
 
-// Warna status
+// Fungsi untuk memberi warna pada status
 const getStatusClass = (status) => {
   if (status === 'Sakit') return 'status-sakit';
   if (status === 'Izin') return 'status-izin';
@@ -101,11 +94,11 @@ const getStatusClass = (status) => {
   return '';
 };
 
-// Submit absensi
+// Kirim data absensi ke backend
 const submitAbsensi = async () => {
   try {
-    console.log("Data yang dikirim:", absensiList.value);
-    await axios.post('http://localhost:8080/api/absensi', absensiList.value);
+    console.log("Data yang dikirim:", absensiList.value);  // Debugging data yang dikirim
+    await axios.post('http://localhost:8080/api/absensi', absensiList.value);  // Kirim seluruh data absensi
     alert('Absensi berhasil disimpan!');
   } catch (error) {
     console.error('Error submitting absensi:', error);
@@ -113,48 +106,27 @@ const submitAbsensi = async () => {
   }
 };
 
-// Set userRole dari localStorage
-onMounted(() => {
-  const role = localStorage.getItem('userRole');
-  userRole.value = role ? role : '';
-  fetchSiswa();
-});
+onMounted(fetchSiswa);
 </script>
 
 <style scoped>
-/* Layout untuk Admin */
-.admin-layout {
-  display: flex;
-}
-
-.admin-layout .content {
-  margin-left: 250px; /* Geser konten ke kanan */
-  width: calc(100% - 250px);
-  padding: 20px;
-}
-
-/* Layout untuk User */
-.user-layout .content {
-  margin-top: 80px; /* Pastikan tidak tertutup navbar */
-  padding: 20px;
-}
-
-/* Container */
+/* Container Styling with added margin-top for spacing */
 .container {
   max-width: 1000px;
   margin: 0 auto;
+  margin-top: 90px; /* Ensuring it doesn't get covered by the navbar */
 }
 
-/* Filter */
+/* Filter Container for Jurusan and Kelas */
 .filter-container {
   margin-bottom: 20px;
   display: flex;
   gap: 12px;
-  flex-wrap: wrap;
+  flex-wrap: wrap; /* Ensures buttons wrap on smaller screens */
   justify-content: center;
 }
 
-/* Form Select */
+/* Styling for Filter Dropdowns */
 .form-select {
   padding: 10px;
   font-size: 16px;
@@ -163,7 +135,7 @@ onMounted(() => {
   transition: all 0.3s ease;
 }
 
-/* Table */
+/* Table Styling */
 .table {
   width: 100%;
   border-collapse: collapse;
@@ -202,9 +174,9 @@ onMounted(() => {
   color: #856404;
 }
 
-/* Submit Button */
+/* Styling for Submit Button */
 .btn-submit {
-  background-color: #28a745;
+  background-color: #28a745; /* Green */
   color: white;
   padding: 12px 24px;
   font-size: 16px;
@@ -216,6 +188,7 @@ onMounted(() => {
 }
 
 .btn-submit:hover {
-  background-color: #218838;
+  background-color: #218838; /* Darker green on hover */
 }
+
 </style>

@@ -1,52 +1,32 @@
 <template>
   <nav class="navbar">
     <div class="logo">
-      <nuxt-link to="/">TooPiket</nuxt-link>
+      <nuxt-link class="fon" to="/">TooPiket</nuxt-link>
     </div>
-    <button class="menu-toggle" @click="toggleMenu">
-      <i class="fas" :class="menuOpen ? 'fa-times' : 'fa-bars'"></i>
-    </button>
     <ul class="menu" :class="{ 'menu-open': menuOpen }">
-      <li>
-        <nuxt-link to="/daftarGuru" class="menu-item">
-          <i class="fas fa-users"></i> Daftar Guru
-        </nuxt-link>
-      </li>
-      <!-- Dropdown Absensi -->
-      <li class="dropdown">
-        <button class="menu-item dropdown-toggle" @click="toggleDropdown('absensiDropdown')">
-          <i class="fas fa-clipboard-list"></i> Absensi <i ></i>
+      <li class="dropdown" v-for="dropdown in dropdowns" :key="dropdown.name">
+        <button class="menu-item dropdown-toggle" @click.stop="toggleDropdown(dropdown.name)">
+          <i :class="dropdown.icon"></i> {{ dropdown.label }}
         </button>
-        <ul v-show="activeDropdown === 'absensiDropdown'" class="dropdown-menu">
-          <li>
-            <nuxt-link to="/absensi" class="menu-item">Absensi Siswa</nuxt-link>
-          </li>
-          <li>
-            <nuxt-link to="/rekapAbsen" class="menu-item">Rekap Absensi</nuxt-link>
-          </li>
-        </ul>
-      </li>
-      <li class="dropdown">
-        <button class="menu-item dropdown-toggle" @click="toggleDropdown('absensiDropdown')">
-          <i class="fas fa-clipboard-check"></i> IZIN <i ></i>
-        </button>
-        <ul v-show="activeDropdown === 'absensiDropdown'" class="dropdown-menu">
-          <li>
-            <nuxt-link to="/ijin-siswa" class="menu-item">Buat Ijin</nuxt-link>
-          </li>
-          <li>
-            <nuxt-link to="/daftar-ijin" class="menu-item">Daftar Ijin</nuxt-link>
+        <ul :class="{ show: activeDropdown === dropdown.name }" class="dropdown-menu">
+          <li v-for="item in dropdown.items" :key="item.name">
+            <nuxt-link :to="item.link" class="menu-item" @click.stop="closeMenu">{{ item.name }}</nuxt-link>
           </li>
         </ul>
       </li>
       <li v-for="menu in menus" :key="menu.name">
-        <nuxt-link :to="menu.link" class="menu-item">
+        <nuxt-link :to="menu.link" class="menu-item" @click="closeMenu">
           <i :class="menu.icon"></i> {{ menu.name }}
         </nuxt-link>
       </li>
       <li>
-        <nuxt-link to="/profile" class="menu-item">
+        <nuxt-link to="/profile" class="menu-item" @click="closeMenu">
           <i class="fas fa-user"></i> Profil
+        </nuxt-link>
+      </li>
+      <li>
+        <nuxt-link to="/register" class="menu-item" @click="closeMenu">
+          <i class="fas fa-list"></i> Register
         </nuxt-link>
       </li>
     </ul>
@@ -63,7 +43,40 @@ export default {
   data() {
     return {
       menuOpen: false,
-      activeDropdown: null, // Untuk mengontrol dropdown yang aktif
+      activeDropdown: null,
+      dropdowns: [
+        {
+          name: "absensiDropdown",
+          label: "Absensi",
+          icon: "fas fa-clipboard-list",
+          items: [
+            { name: "Absensi Siswa", link: "/absensi" },
+            { name: "Rekap Absensi", link: "/rekapAbsen" },
+          ],
+        },
+        {
+          name: "izinDropdown",
+          label: "Siswa",
+          icon: "fas fa-clipboard-check",
+          items: [
+            { name: "Buat Izin", link: "/ijin-siswa" },
+            { name: "Daftar Izin", link: "/daftar-ijin" },
+            { name: "Daftar Siswa", link: "/siswa/siswa" },
+          ],
+        },
+        {
+          name: "guruDropdown",
+          label: "Guru",
+          icon: "fas fa-user-tie",
+          items: [
+            { name: "Daftar Guru", link: "/daftarGuru" },
+            { name: "Jadwal Guru", link: "/jadwalGuru" },
+          ],
+        },
+      ],
+      menus: [
+        { name: "Dashboard", link: "/dashboard", icon: "fas fa-home" },
+      ],
     };
   },
   async mounted() {
@@ -73,32 +86,17 @@ export default {
     ...mapState({
       userRole: (state) => state.user.role,
     }),
-    menus() {
-      const baseMenus = [
-        { name: "Jadwal Guru Piket", link: "/jadwalGuru", icon: "fas fa-calendar-alt" },
-  
-      ];
-
-      if (this.userRole === "admin") {
-        baseMenus.push(
-          { name: "Register", link: "/register", icon: "fas fa-user-plus" },
-          { name: "Home", link: "/homeAdmin", icon: "fas fa-home" }
-        );
-      }
-
-    },
   },
   methods: {
     toggleMenu() {
       this.menuOpen = !this.menuOpen;
     },
     toggleDropdown(dropdown) {
-      // Toggle antara dropdown yang aktif
-      if (this.activeDropdown === dropdown) {
-        this.activeDropdown = null;
-      } else {
-        this.activeDropdown = dropdown;
-      }
+      this.activeDropdown = this.activeDropdown === dropdown ? null : dropdown;
+    },
+    closeMenu() {
+      this.menuOpen = false;
+      this.activeDropdown = null;
     },
   },
 };
@@ -118,15 +116,6 @@ export default {
   padding: 15px 30px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   z-index: 1000;
-}
-
-.logo {
-  font-size: 24px;
-  font-weight: bold;
-  color: #ecf0f1;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  text-decoration: none;
 }
 
 .menu {
@@ -151,83 +140,44 @@ export default {
   transform: translateY(-2px);
 }
 
-.menu-toggle {
-  display: none;
-  background: none;
-  border: none;
-  color: white;
-  font-size: 24px;
-  cursor: pointer;
-}
-
-@media (max-width: 768px) {
-  .menu-toggle {
-    display: block;
-  }
-
-  .menu {
-    position: absolute;
-    top: 60px;
-    left: 0;
-    width: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    flex-direction: column;
-    align-items: center;
-    gap: 15px;
-    padding: 20px 0;
-    display: none;
-  }
-
-  .menu-open {
-    display: flex;
-  }
-}
-
-.user-role {
-  font-size: 18px;
-}
-
-/* Dropdown Menu */
 .dropdown {
   position: relative;
-}
-
-.dropdown-toggle {
-  background: none;
-  border: none;
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
 }
 
 .dropdown-menu {
   position: absolute;
   top: 100%;
   left: 0;
-  background-color: rgba(0, 0, 0, 0.9);
+  background-color: #fff;
   border-radius: 5px;
   list-style: none;
   padding: 10px 0;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
   display: none;
-  flex-direction: column;
+  min-width: 180px;
 }
 
-.dropdown-menu .menu-item {
+.dropdown-menu.show {
+  display: block;
+}
+
+.dropdown-menu li {
   padding: 10px 20px;
-  color: white;
-  text-align: left;
+  white-space: nowrap;
 }
 
-.dropdown-menu .menu-item:hover {
-  color: #3498db;
-  transform: none;
-}
-
-.dropdown:hover .dropdown-menu {
+.dropdown-toggle {
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: #ecf0f1;
+  cursor: pointer;
   display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
+.user-role {
+  font-size: 18px;
+}
 </style>

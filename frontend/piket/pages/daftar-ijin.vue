@@ -1,7 +1,6 @@
 <template>
   <div>
-    <NavAdmin v-if="userRole === 'admin'" />
-    <Navbar v-else />
+    <Navbar />
     <div class="container">
       <h1>Daftar Izin Keluar</h1>
 
@@ -14,7 +13,11 @@
       />
 
       <!-- Input Filter Bulan -->
-      <input type="month" v-model="searchMonth" class="search-month" />
+      <input
+        type="month"
+        v-model="searchMonth"
+        class="search-month"
+      />
 
       <!-- Tabel Izin -->
       <table>
@@ -48,8 +51,7 @@
             <td>{{ formatTanggalWaktu(izin.waktu_keluar) }}</td>
             <td>{{ izin.waktu_masuk ? formatTanggalWaktu(izin.waktu_masuk) : "-" }}</td>
             <td>
-              <button
-                class="btn-konfirmasi"
+              <button class="btn-konfirmasi"
                 v-if="izin.status === 'Keluar'"
                 @click="konfirmasiMasuk(izin.ID)"
               >
@@ -67,24 +69,20 @@
 <script>
 import axios from "axios";
 import Navbar from "../components/Navbar.vue";
-import NavAdmin from "../components/NavAdmin.vue";
 
 export default {
   components: {
     Navbar,
-    NavAdmin,
   },
   data() {
     return {
       izins: [],
       searchQuery: "",
       searchMonth: "",
-      userRole: "user", // Default role
     };
   },
   async mounted() {
     await this.fetchIzin();
-    this.userRole = localStorage.getItem("userRole") || "user"; // Ambil peran pengguna dari localStorage
   },
   computed: {
     filteredIzins() {
@@ -118,7 +116,10 @@ export default {
         await axios.put(`http://localhost:8080/api/izin/${id}/konfirmasi`);
         this.fetchIzin();
       } catch (error) {
-        console.error("❌ Gagal mengonfirmasi masuk:", error.response?.data || error);
+        console.error(
+          "❌ Gagal mengonfirmasi masuk:",
+          error.response?.data || error
+        );
       }
     },
     async hapusIzin(id) {
@@ -130,7 +131,10 @@ export default {
         await axios.delete(`http://localhost:8080/api/izin/${id}`);
         this.fetchIzin();
       } catch (error) {
-        console.error("❌ Gagal menghapus izin:", error.response?.data || error);
+        console.error(
+          "❌ Gagal menghapus izin:",
+          error.response?.data || error
+        );
       }
     },
     formatTanggalWaktu(waktu) {

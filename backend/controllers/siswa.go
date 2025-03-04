@@ -100,3 +100,11 @@ func UpdateSiswa(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Data siswa berhasil diperbarui", "data": siswa})
 }
 
+func DeleteSiswa(c *gin.Context) {
+    id := c.Param("id")
+    if err := database.DB.Delete(&models.Siswa{}, id).Error; err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal menghapus siswa"})
+        return
+    }
+    c.JSON(http.StatusOK, gin.H{"message": "Siswa berhasil dihapus"})
+}

@@ -38,6 +38,9 @@ func RegisterRoutes(r *gin.Engine) {
 		api.POST("/siswa", controllers.CreateSiswa)       // Endpoint untuk create siswa
 		api.POST("/siswa/batch", controllers.CreateSiswaBatch) // Endpoint untuk create siswa batch
         api.PUT("/siswa/:id", controllers.UpdateSiswa)
+		api.DELETE("/siswa/:id", controllers.DeleteSiswa)
+		
+
 
 
 		// Routes untuk absensi

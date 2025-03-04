@@ -1,7 +1,6 @@
 <template>
   <div>
-    <NavAdmin v-if="userRole === 'admin'" />
-    <Navbar v-else />
+    <Navbar />
     <div class="container">
       <h1>Daftar Siswa</h1>
 
@@ -10,12 +9,7 @@
         <button
           v-for="j in jurusanList"
           :key="j"
-          class="btn filter-btn m-1"
-          :class="{
-            'btn-success': j === 'PH',
-            'btn-primary': j === 'RPL',
-            'btn-pink': j === 'MPLB'
-          }"
+          class="btn btn-primary m-1"
           @click="filterJurusan = (filterJurusan === j) ? null : j">
           {{ j }}
         </button>
@@ -26,8 +20,7 @@
         <button
           v-for="k in kelasList"
           :key="k"
-          class="btn filter-btn m-1"
-          :class="getKelasButtonColor(k)"
+          class="btn btn-secondary m-1"
           @click="filterKelas = (filterKelas === k) ? null : k">
           {{ k }}
         </button>
@@ -37,7 +30,7 @@
       <table class="table table-striped table-bordered">
         <thead>
           <tr>
-            <th>No</th>
+            <th>ID</th>
             <th>NIS</th>
             <th>Nama</th>
             <th>Jurusan</th>
@@ -52,18 +45,18 @@
           <tr v-if="filteredSiswa.length === 0">
             <td colspan="9" class="text-center">Tidak ada data siswa</td>
           </tr>
-          <tr v-for="(siswa, index) in filteredSiswa" :key="siswa.id">
-            <td>{{ index + 1 }}</td>
+          <tr v-for="siswa in filteredSiswa" :key="siswa.id">
+            <td>{{ siswa.id }}</td>
             <td>{{ siswa.nis }}</td>
-            <td @click="showModal(siswa)" class="nama-siswa">
+            <td @click="showModal(siswa)" class="text-primary cursor-pointer nama-siswa">
               {{ siswa.nama }}
             </td>
             <td>{{ siswa.jurusan }}</td>
             <td>{{ siswa.kelas }}</td>
-            <td :class="'bg-hadir text-success fw-bold'">{{ siswa.jumlahHadir }}</td>
-            <td :class="'bg-sakit text-primary fw-bold'">{{ siswa.jumlahSakit }}</td>
-            <td :class="'bg-izin text-warning fw-bold'">{{ siswa.jumlahIzin }}</td>
-            <td :class="'bg-alfa text-danger fw-bold'">{{ siswa.jumlahAlfa }}</td>
+            <td>{{ siswa.jumlahHadir }}</td>
+            <td>{{ siswa.jumlahSakit }}</td>
+            <td>{{ siswa.jumlahIzin }}</td>
+            <td>{{ siswa.jumlahAlfa }}</td>
           </tr>
         </tbody>
       </table>
@@ -79,18 +72,15 @@
   </div>
 </template>
 
-
 <script>
 import RekapAbsensiModal from "@/components/RekapAbsensiModal.vue";
 import Navbar from "../components/Navbar.vue";
 import axios from "axios";
-import NavAdmin from "../components/NavAdmin.vue";
 
 export default {
   components: {
     RekapAbsensiModal,
     Navbar,
-    NavAdmin
   },
   data() {
     return {
@@ -100,8 +90,9 @@ export default {
       absensiSiswa: [],
       filterJurusan: null,
       filterKelas: null,
-      jurusanList: ["RPL", "MPLB", "PH"],
-      kelasList: ["10A", "10B", "10C", "11A", "11B", "11C", "12A", "12B", "12C"],
+      // Diubah sesuai permintaan
+      jurusanList: ["RPL", "MPLB", "PH"],  // Diubah jurusannya
+      kelasList: ["10A", "10B", "10C", "11A", "11B", "11C", "12A", "12B", "12C"],  // Filter kelas 10, 11, 12
     };
   },
   computed: {
@@ -116,10 +107,6 @@ export default {
   },
   created() {
     this.fetchAllSiswa();
-  },
-  mounted() {
-    // Ambil peran user dari localStorage
-    this.userRole = localStorage.getItem("userRole") || "user";
   },
   methods: {
     async fetchAllSiswa() {
@@ -157,13 +144,6 @@ export default {
       }
     },
 
-    getKelasButtonColor(kelas) {
-      if (kelas.startsWith("10")) return "btn-success"; // Hijau untuk kelas 10
-      if (kelas.startsWith("11")) return "btn-warning"; // Kuning untuk kelas 11
-      if (kelas.startsWith("12")) return "btn-danger";  // Merah untuk kelas 12
-      return "btn-secondary";
-    },
-
     async showModal(siswa) {
       this.selectedSiswa = siswa;
       this.showModalFlag = true;
@@ -186,107 +166,24 @@ export default {
   margin-top: 90px;
 }
 
-/* Styling tabel */
-.table {
-  border-collapse: separate;
-  border-spacing: 0;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
-  background: white;
+.filter-container {
+  margin-bottom: 10px;
 }
 
-/* Header tabel */
-.table thead {
-  background: linear-gradient(135deg, #007bff, #0056b3);
-  color: white;
-  font-size: 1rem;
-  text-transform: uppercase;
+.btn {
+  margin-right: 5px;
 }
 
-/* Warna background untuk kategori absensi */
-.bg-hadir {
-  background-color: rgba(40, 167, 69, 0.2); /* Hijau lembut */
-}
-
-.bg-sakit {
-  background-color: rgba(0, 123, 255, 0.2); /* Biru lembut */
-}
-
-.bg-izin {
-  background-color: rgba(255, 193, 7, 0.2); /* Kuning lembut */
-}
-
-.bg-alfa {
-  background-color: rgba(220, 53, 69, 0.2); /* Merah lembut */
-}
-
-/* Hover efek untuk baris */
-.table tbody tr {
-  transition: background 0.3s ease-in-out, transform 0.2s;
-}
-
-.table tbody tr:hover {
-  background: rgba(0, 123, 255, 0.1);
-  transform: scale(1.02);
-}
-
-/* Styling untuk sel */
-.table td, .table th {
-  padding: 12px;
-  text-align: center;
-  border-bottom: 2px solid #dee2e6;
-}
-
-/* Efek hover tombol filter */
-.filter-btn {
-  transition: transform 0.3s ease-in-out, rotate 0.2s;
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.filter-btn:hover {
-  transform: scale(1.12) rotate(3deg);
-  box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-/* Hover Nama Siswa */
 .nama-siswa {
   font-weight: bold;
   font-size: 1.1rem;
   color: #007bff;
   cursor: pointer;
-  transition: transform 0.3s ease-in-out;
+  transition: color 0.3s;
 }
 
 .nama-siswa:hover {
-  color: #ff4500;
-  transform: scale(1.2);
-}
-
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1050; /* Lebih tinggi dari navbar */
-}
-
-.modal-content {
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  width: 600px;
-  z-index: 1051; /* Pastikan modal tetap di atas overlay */
-}
-
-.text-danger {
-  color: red;
+  color: #0056b3;
+  text-decoration: none;
 }
 </style>
-
-
