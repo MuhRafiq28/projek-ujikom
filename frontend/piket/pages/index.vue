@@ -1,5 +1,5 @@
 <template>
-  <!-- From Uiverse.io by adamgiebl -->
+  <!-- Animasi Loading -->
   <section class="dots-container">
     <div class="dot"></div>
     <div class="dot"></div>
@@ -13,14 +13,16 @@
 export default {
   name: 'IndexPage',
   mounted() {
-    const token = localStorage.getItem('authToken'); // Perbaiki key Token
+    const token = localStorage.getItem('authToken'); // Ambil token dari localStorage
     console.log("🔍 Token ditemukan:", token); // Debugging
 
-    if (token) {
-      this.$nextTick(() => {
-        this.$router.push('/home');
-      });
-    }
+    this.$nextTick(() => {
+      if (token) {
+        this.$router.push('/homenew'); // Jika ada token, pindah ke homenew
+      } else {
+        this.$router.push('/login'); // Jika tidak ada token, pindah ke login
+      }
+    });
   }
 };
 </script>
@@ -28,15 +30,13 @@ export default {
 <style scoped>
 /* Pusatkan animasi di tengah layar */
 .dots-container {
-  position: fixed; /* Pastikan elemen tetap di tengah saat scroll */
+  position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   display: flex;
   align-items: center;
   justify-content: center;
-  height: auto;
-  width: auto;
 }
 
 /* Animasi loading */
@@ -71,13 +71,11 @@ export default {
     background-color: #b3d4fc;
     box-shadow: 0 0 0 0 rgba(178, 212, 252, 0.7);
   }
-
   50% {
     transform: scale(1.2);
     background-color: #6793fb;
     box-shadow: 0 0 0 10px rgba(178, 212, 252, 0);
   }
-
   100% {
     transform: scale(0.8);
     background-color: #b3d4fc;

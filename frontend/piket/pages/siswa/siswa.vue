@@ -1,7 +1,7 @@
 <template>
   <div>
-    <Navbar />
- 
+    <Navnew />
+
   <div class="container" style="margin-top: 80px;">
     <h2 class="title">Data Siswa</h2>
 
@@ -31,7 +31,7 @@
     </div>
 
     <!-- Tambah Siswa Button -->
-    
+
     <button @click="isModalVisible = true" class="btn-add">Tambah Siswa</button>
 
     <!-- Modal Tambah Banyak Siswa -->
@@ -100,12 +100,12 @@
 import { ref, computed, onMounted } from '@nuxtjs/composition-api'
 import axios from 'axios'
 import TambahBanyakSiswaModal from '@/components/TambahBanyakSiswaModal.vue'
-import Navbar from '../../components/Navbar.vue'
+import Navnew from '../../components/Navnew.vue'
 
 export default {
   components: {
     TambahBanyakSiswaModal,
-    Navbar
+    Navnew
   },
   setup() {
     const siswaList = ref([])
@@ -114,7 +114,7 @@ export default {
     const isModalVisible = ref(false)
     const isFormVisible = ref(false)
     const isEditing = ref(false)
-   
+
 
 
     const formData = ref({
@@ -170,7 +170,7 @@ export default {
       }
     }
 
-    
+
 
 
     const submitForm = async () => {
@@ -183,16 +183,16 @@ export default {
       isEditing.value = false
       isFormVisible.value = false
       // Menggunakan alert untuk notifikasi
-      alert(response.data.message || "Data siswa berhasil diperbarui!")  
+      alert(response.data.message || "Data siswa berhasil diperbarui!")
     } else {
       const response = await axios.post("http://localhost:8080/api/siswa", formData.value)
       siswaList.value.push(response.data)
-      alert("Siswa berhasil ditambahkan!")  
+      alert("Siswa berhasil ditambahkan!")
     }
     closeForm()
   } catch (error) {
     console.error("Gagal menyimpan data:", error)
-    alert("Gagal menyimpan data!")  
+    alert("Gagal menyimpan data!")
   }
 }
 
@@ -394,6 +394,12 @@ table {
   margin-top: 20px;
 }
 
+table thead {
+  background: linear-gradient(135deg, #9099A2, #96858F);
+  color: white;
+  font-weight: bold;
+}
+
 thead {
   background: #007bff;
   color: white;
@@ -434,4 +440,4 @@ button:hover {
 .btn-add:hover {
   background-color: #218838;
 }
-</style>  
+</style>

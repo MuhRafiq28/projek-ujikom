@@ -1,10 +1,10 @@
 <template>
   <div>
-    <Navbar />
+    <Navnew />
     <div class="container">
       <div class="form-container">
         <div class="image-container">
-          <img src="@/images/IZIN.jpg" alt="Izin Illustration" />
+          <img src="/images/IZIN.jpg" alt="Izin Illustration" />
         </div>
         <div class="form-content">
           <h1>Buat Izin</h1>
@@ -36,10 +36,10 @@
 
 <script>
 import axios from "axios";
-import Navbar from "../components/Navbar.vue";
+import Navnew from "../components/Navnew.vue";
 
 export default {
-  components: { Navbar },
+  components: { Navnew },
   data() {
     return {
       izinBaru: { nama: "", alasan: "", status: "Keluar" },
@@ -65,7 +65,7 @@ export default {
 <style scoped>
 .container {
   max-width: 900px;
-  margin: 120px auto 80px; /* Memberi jarak lebih dari navbar */
+  margin: 170px auto 80px; /* Memberi jarak lebih dari navbar */
   padding: 20px;
   background: #fff;
   border-radius: 10px;

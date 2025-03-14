@@ -11,7 +11,7 @@
         </p>
       </div>
       <div class="image">
-        <img src="@/images/smkn.png" alt="SMKN 1 Cisarua" />
+        <img src="/images/smkn.png" alt="SMKN 1 Cisarua" />
       </div>
     </div>
 

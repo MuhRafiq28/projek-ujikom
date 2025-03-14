@@ -127,7 +127,7 @@ export default {
 
 .menu-item {
   font-size: 16px;
-  color: #ecf0f1;
+  color: black;
   text-decoration: none;
   transition: color 0.3s ease, transform 0.3s ease;
   display: flex;
@@ -148,7 +148,7 @@ export default {
   position: absolute;
   top: 100%;
   left: 0;
-  background-color: #fff;
+  color: black;
   border-radius: 5px;
   list-style: none;
   padding: 10px 0;
@@ -170,7 +170,7 @@ export default {
   background: none;
   border: none;
   font-size: 16px;
-  color: #ecf0f1;
+  color: black;
   cursor: pointer;
   display: flex;
   align-items: center;

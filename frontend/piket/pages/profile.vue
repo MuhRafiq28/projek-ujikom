@@ -1,7 +1,7 @@
 <template>
   <div class="profile">
-    <Navbar />
-    <div class="profile-page">
+    <Navnew />
+    <div class="container profile-page ">
       <h1>Profil Pengguna</h1>
       <div class="profile-info">
         <div class="profile-item">
@@ -24,10 +24,10 @@
 </template>
 
 <script>
-import Navbar from '~/components/Navbar.vue';
+import Navnew from '~/components/Navnew.vue';
 
 export default {
-  components: { Navbar },
+  components: { Navnew },
   data() {
     return {
       profile: {
@@ -69,7 +69,8 @@ export default {
 <style scoped>
 .profile-page {
   max-width: 600px;
-  margin: 50px auto;
+  margin-top: 120px;
+  align-items: center;
   padding: 20px;
   background-color: #f8f9fa;
   border-radius: 8px;

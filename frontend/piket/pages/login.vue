@@ -54,11 +54,11 @@ export default {
 
           // Redirect ke halaman berdasarkan role
           if (role === 'admin') {
-            this.$router.push('/home-admin');
+            this.$router.push('/homenew');
           } else if (role === 'staf') {
             this.$router.push('/home-staf');
           } else {
-            this.$router.push('/home');
+            this.$router.push('/homenew');
           }
         } else {
           alert('Login gagal, token tidak ditemukan.');

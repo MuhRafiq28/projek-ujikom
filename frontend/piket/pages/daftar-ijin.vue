@@ -1,8 +1,8 @@
 <template>
   <div>
-    <Navbar />
+    <Navnew />
     <div class="container">
-      <h1>Daftar Izin Keluar</h1>
+      <h1>Daftar Izin Siswa</h1>
 
       <!-- Input Pencarian -->
       <input
@@ -68,11 +68,11 @@
 
 <script>
 import axios from "axios";
-import Navbar from "../components/Navbar.vue";
+import Navnew from "../components/Navnew.vue";
 
 export default {
   components: {
-    Navbar,
+    Navnew,
   },
   data() {
     return {
@@ -196,7 +196,7 @@ h1 {
 }
 
 button {
-  background: linear-gradient(135deg, #3498db, #8e44ad);
+  background: linear-gradient(135deg, #9cc7e4, #6D7993);
   color: white;
   cursor: pointer;
   font-weight: bold;
@@ -226,7 +226,7 @@ td {
 }
 
 th {
-  background-color: #3800bb;
+  background-color: #96858F;
   font-weight: bold;
   color: white;
 }

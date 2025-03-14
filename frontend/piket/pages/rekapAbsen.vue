@@ -1,8 +1,8 @@
 <template>
   <div>
-    <Navbar />
+    <Navnew />
     <div class="container">
-      <h1>Daftar Siswa</h1>
+      <h1>Rekap Absen Siswa</h1>
 
       <!-- Filter Jurusan -->
       <div class="filter-container">
@@ -28,38 +28,39 @@
 
       <!-- Tabel Siswa -->
       <table class="table table-striped table-bordered">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>NIS</th>
-            <th>Nama</th>
-            <th>Jurusan</th>
-            <th>Kelas</th>
-            <th>Hadir</th>
-            <th>Sakit</th>
-            <th>Izin</th>
-            <th>Alfa</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-if="filteredSiswa.length === 0">
-            <td colspan="9" class="text-center">Tidak ada data siswa</td>
-          </tr>
-          <tr v-for="siswa in filteredSiswa" :key="siswa.id">
-            <td>{{ siswa.id }}</td>
-            <td>{{ siswa.nis }}</td>
-            <td @click="showModal(siswa)" class="text-primary cursor-pointer nama-siswa">
-              {{ siswa.nama }}
-            </td>
-            <td>{{ siswa.jurusan }}</td>
-            <td>{{ siswa.kelas }}</td>
-            <td>{{ siswa.jumlahHadir }}</td>
-            <td>{{ siswa.jumlahSakit }}</td>
-            <td>{{ siswa.jumlahIzin }}</td>
-            <td>{{ siswa.jumlahAlfa }}</td>
-          </tr>
-        </tbody>
-      </table>
+  <thead>
+    <tr>
+      <th>No</th> <!-- Mengubah ID menjadi No -->
+      <th>NIS</th>
+      <th>Nama</th>
+      <th>Jurusan</th>
+      <th>Kelas</th>
+      <th>Hadir</th>
+      <th>Sakit</th>
+      <th>Izin</th>
+      <th>Alfa</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr v-if="filteredSiswa.length === 0">
+      <td colspan="9" class="text-center">Tidak ada data siswa</td>
+    </tr>
+    <tr v-for="(siswa, index) in filteredSiswa" :key="siswa.id">
+      <td>{{ index + 1 }}</td> <!-- Nomor urut -->
+      <td>{{ siswa.nis }}</td>
+      <td @click="showModal(siswa)" class="text-primary cursor-pointer nama-siswa">
+        {{ siswa.nama }}
+      </td>
+      <td>{{ siswa.jurusan }}</td>
+      <td>{{ siswa.kelas }}</td>
+      <td>{{ siswa.jumlahHadir }}</td>
+      <td>{{ siswa.jumlahSakit }}</td>
+      <td>{{ siswa.jumlahIzin }}</td>
+      <td>{{ siswa.jumlahAlfa }}</td>
+    </tr>
+  </tbody>
+</table>
+
 
       <!-- Modal untuk menampilkan detail absensi -->
       <RekapAbsensiModal
@@ -74,13 +75,13 @@
 
 <script>
 import RekapAbsensiModal from "@/components/RekapAbsensiModal.vue";
-import Navbar from "../components/Navbar.vue";
+import Navnew from "../components/Navnew.vue";
 import axios from "axios";
 
 export default {
   components: {
     RekapAbsensiModal,
-    Navbar,
+    Navnew,
   },
   data() {
     return {
@@ -160,30 +161,112 @@ export default {
 </script>
 
 <style scoped>
+/* Container styling */
 .container {
   max-width: 1000px;
   margin: 0 auto;
   margin-top: 90px;
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
+/* Tombol filter */
 .filter-container {
-  margin-bottom: 10px;
+  margin-bottom: 15px;
 }
 
 .btn {
-  margin-right: 5px;
+  padding: 8px 15px;
+  font-size: 14px;
+  font-weight: bold;
+  border-radius: 8px;
+  transition: all 0.3s ease-in-out;
 }
 
+.btn-primary {
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  color: #fff;
+  border: none;
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, #28a745, #1c7a2e);
+  color: #fff;
+  border: none;
+}
+
+.btn:hover {
+  transform: scale(1.05);
+  opacity: 0.9;
+}
+
+/* Tabel styling */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.table thead {
+  background: linear-gradient(135deg, #9099A2, #96858F);
+  color: white;
+  font-weight: bold;
+}
+
+.table thead th {
+  padding: 12px;
+  text-align: center;
+}
+
+.table tbody tr {
+  transition: background 0.3s ease-in-out;
+}
+
+.table tbody tr:hover {
+  background: #f2f2f2;
+}
+
+/* Styling untuk nomor urut */
+.table tbody td {
+  padding: 10px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+}
+
+
+/* Nama siswa dengan efek hover */
 .nama-siswa {
   font-weight: bold;
   font-size: 1.1rem;
-  color: #007bff;
+  color: black;
   cursor: pointer;
-  transition: color 0.3s;
+  transition: all 0.3s ease-in-out;
+  text-decoration: none;
+  position: relative;
 }
 
 .nama-siswa:hover {
-  color: #0056b3;
-  text-decoration: none;
+  color: #606060;
+}
+
+.nama-siswa::after {
+  content: "";
+  display: block;
+  width: 0;
+  height: 2px;
+  background: #a88f7f;
+  transition: width 0.3s;
+  position: absolute;
+  bottom: -3px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.nama-siswa:hover::after {
+  width: 100%;
 }
 </style>
+

@@ -1,8 +1,7 @@
 <template>
   <div>
-    <!-- Navbar admin jika userRole adalah admin -->
-    <NavAdmin v-if="userRole === 'admin'" />
-    <Navbar v-else />
+
+    <Navnew/>
 
     <div class="container">
       <div class="card">
@@ -19,7 +18,7 @@
           </form>
         </div>
         <div class="image-container">
-          <img src="@/images/IZIN.jpg" alt="Image" />
+          <img src="/images/IZIN.jpg" alt="Image" />
         </div>
       </div>
 
@@ -46,13 +45,12 @@
 
 <script>
 import axios from "axios";
-import Navbar from "~/components/Navbar.vue";
-import NavAdmin from "../components/NavAdmin.vue";
+import Navnew from "~/components/Navnew.vue";
+
 
 export default {
   components: {
-    Navbar,
-    NavAdmin,
+    Navnew,
   },
   data() {
     return {
@@ -103,8 +101,8 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 80px; /* Menambah jarak atas dari navbar */
-  padding-bottom: 40px; /* Menambah jarak bawah */
+  margin-top: 100px;
+
 }
 
 .card {

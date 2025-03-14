@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Navbar />
+    <Navnew />
     <div class="container">
       <h2 class="title">Absensi Siswa</h2>
 
@@ -31,7 +31,7 @@
             <td>{{ index + 1 }}</td>
             <td>{{ absensi.nama }}</td>
             <td>{{ absensi.kelas }}</td>
-            <td>{{ absensi.jurusan }}</td>
+            <td :class="getJurusanClass(absensi.jurusan)">{{ absensi.jurusan }}</td>
             <td>
               <select v-model="absensi.status" class="form-select" :class="getStatusClass(absensi.status)">
                 <option value="Hadir">Hadir</option>
@@ -49,84 +49,105 @@
   </div>
 </template>
 
-<script setup>
-import { ref, computed, onMounted } from 'vue';
+<script>
 import axios from 'axios';
-import Navbar from '../components/Navbar.vue';
+import Navnew from '../components/Navnew.vue';
 
-const absensiList = ref([]);
-const kelasList = ['10A', '10B', '10C', '11A', '11B', '11C', '12A', '12B', '12C'];
-const jurusanList = ['RPL', 'MPLB', 'PH'];
-let selectedKelas = ref('');
-let selectedJurusan = ref('');
+export default {
+  components: {
+    Navnew
+  },
+  data() {
+    return {
+      absensiList: [],
+      kelasList: ['10A', '10B', '10C', '11A', '11B', '11C', '12A', '12B', '12C'],
+      jurusanList: ['RPL', 'MPLB', 'PH', 'TO'],
+      selectedKelas: '',
+      selectedJurusan: ''
+    };
+  },
+  computed: {
+    filteredAbsensi() {
+      return this.absensiList.filter(siswa => {
+        const matchesKelas = !this.selectedKelas || siswa.kelas === this.selectedKelas;
+        const matchesJurusan = !this.selectedJurusan || siswa.jurusan === this.selectedJurusan;
+        return matchesKelas && matchesJurusan;
+      });
+    }
+  },
+  methods: {
+    async fetchSiswa() {
+      try {
+        const response = await axios.get('http://localhost:8080/api/siswa');
+        this.absensiList = response.data.map((siswa) => ({
+          siswa_id: siswa.id,
+          nama: siswa.nama,
+          kelas: siswa.kelas,
+          jurusan: siswa.jurusan,
+          status: 'Hadir',
+          tanggal: new Date().toISOString().split('T')[0]
+        }));
+      } catch (error) {
+        console.error('Error fetching siswa:', error);
+      }
+    },
+    getStatusClass(status) {
+      if (status === 'Sakit') return 'status-sakit';
+      if (status === 'Izin') return 'status-izin';
+      if (status === 'Alfa') return 'status-alfa';
+      return '';
+    },
+    getJurusanClass(jurusan) {
+      switch (jurusan) {
+        case 'RPL': return 'text-RPL';
+        case 'PH': return 'text-PH';
+        case 'MPLB': return 'text-MPLB';
+        case 'TO': return 'text-TO';
+        default: return '';
+      }
+    },
+    async submitAbsensi() {
+      try {
+        console.log("Data yang dikirim:", this.absensiList);
+        await axios.post('http://localhost:8080/api/absensi', this.absensiList);
 
-// Ambil daftar siswa dan set default status Hadir
-const fetchSiswa = async () => {
-  try {
-    const response = await axios.get('http://localhost:8080/api/siswa');
-    absensiList.value = response.data.map((siswa) => ({
-      siswa_id: siswa.id,
-      nama: siswa.nama,
-      kelas: siswa.kelas,
-      jurusan: siswa.jurusan,
-      status: 'Hadir', // Default status diubah ke Hadir
-      tanggal: new Date().toISOString().split('T')[0], // Set tanggal otomatis
-    }));
-  } catch (error) {
-    console.error('Error fetching siswa:', error);
+        // Menampilkan notifikasi sukses
+        this.$toast.success("Absensi berhasil disimpan!", {
+          position: "top-right",
+          timeout: 3000
+        });
+      } catch (error) {
+        console.error('Error submitting absensi:', error);
+
+        // Menampilkan notifikasi error
+        this.$toast.error("Gagal menyimpan absensi", {
+          position: "top-right",
+          timeout: 3000
+        });
+      }
+    }
+  },
+  mounted() {
+    this.fetchSiswa();
   }
 };
-
-// Filter absensiList berdasarkan kelas dan jurusan
-const filteredAbsensi = computed(() => {
-  return absensiList.value.filter(siswa => {
-    const matchesKelas = !selectedKelas.value || siswa.kelas === selectedKelas.value;
-    const matchesJurusan = !selectedJurusan.value || siswa.jurusan === selectedJurusan.value;
-    return matchesKelas && matchesJurusan;
-  });
-});
-
-// Fungsi untuk memberi warna pada status
-const getStatusClass = (status) => {
-  if (status === 'Sakit') return 'status-sakit';
-  if (status === 'Izin') return 'status-izin';
-  if (status === 'Alfa') return 'status-alfa';
-  return '';
-};
-
-// Kirim data absensi ke backend
-const submitAbsensi = async () => {
-  try {
-    console.log("Data yang dikirim:", absensiList.value);  // Debugging data yang dikirim
-    await axios.post('http://localhost:8080/api/absensi', absensiList.value);  // Kirim seluruh data absensi
-    alert('Absensi berhasil disimpan!');
-  } catch (error) {
-    console.error('Error submitting absensi:', error);
-    alert('Gagal menyimpan absensi');
-  }
-};
-
-onMounted(fetchSiswa);
 </script>
 
 <style scoped>
-/* Container Styling with added margin-top for spacing */
 .container {
   max-width: 1000px;
   margin: 0 auto;
-  margin-top: 90px; /* Ensuring it doesn't get covered by the navbar */
+  margin-top: 90px;
 }
 
-/* Filter Container for Jurusan and Kelas */
 .filter-container {
   margin-bottom: 20px;
   display: flex;
   gap: 12px;
-  flex-wrap: wrap; /* Ensures buttons wrap on smaller screens */
+  flex-wrap: wrap;
   justify-content: center;
 }
 
-/* Styling for Filter Dropdowns */
 .form-select {
   padding: 10px;
   font-size: 16px;
@@ -135,7 +156,6 @@ onMounted(fetchSiswa);
   transition: all 0.3s ease;
 }
 
-/* Table Styling */
 .table {
   width: 100%;
   border-collapse: collapse;
@@ -150,15 +170,36 @@ onMounted(fetchSiswa);
 }
 
 .table th {
-  background-color: #f4f4f4;
-  color: #555;
+  color: #D5D5D5;
+  background: #96858F;
 }
 
 .table td {
   font-size: 14px;
 }
 
-/* Status Colors */
+/* Warna untuk teks jurusan */
+.text-RPL {
+  color: #007bff; /* Biru */
+  font-weight: bold;
+}
+
+.text-PH {
+  color: #28a745; /* Hijau */
+  font-weight: bold;
+}
+
+.text-MPLB {
+  color: #ff69b4; /* Pink */
+  font-weight: bold;
+}
+
+.text-TO {
+  color: #dc3545; /* Merah */
+  font-weight: bold;
+}
+
+/* Warna berdasarkan status absensi */
 .status-sakit {
   background-color: #f8d7da;
   color: #721c24;
@@ -174,9 +215,8 @@ onMounted(fetchSiswa);
   color: #856404;
 }
 
-/* Styling for Submit Button */
 .btn-submit {
-  background-color: #28a745; /* Green */
+  background-color: #28a745;
   color: white;
   padding: 12px 24px;
   font-size: 16px;
@@ -188,7 +228,6 @@ onMounted(fetchSiswa);
 }
 
 .btn-submit:hover {
-  background-color: #218838; /* Darker green on hover */
+  background-color: #218838;
 }
-
 </style>

@@ -99,3 +99,39 @@ func GetAbsensi(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": absensi})
 }
 
+
+// Hapus absensi berdasarkan ID
+func DeleteAbsensiByID(c *gin.Context) {
+	id := c.Param("id")
+
+	result := database.DB.Delete(&models.Absensi{}, id)
+
+	if result.RowsAffected == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"status": "error", "message": "Data absensi tidak ditemukan"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"status": "success", "message": "Data absensi berhasil dihapus"})
+}
+
+func DeleteAbsensiByNama(c *gin.Context) {
+    nama := c.Param("nama")
+
+    // Cari siswa berdasarkan nama
+    var siswa models.Siswa
+    if err := database.DB.Where("nama = ?", nama).First(&siswa).Error; err != nil {
+        c.JSON(http.StatusNotFound, gin.H{"status": "error", "message": "Siswa tidak ditemukan"})
+        return
+    }
+
+    // Hapus absensi berdasarkan SiswaID
+    result := database.DB.Where("siswa_id = ?", siswa.ID).Delete(&models.Absensi{})
+    if result.RowsAffected == 0 {
+        c.JSON(http.StatusNotFound, gin.H{"status": "error", "message": "Tidak ada data absensi untuk siswa ini"})
+        return
+    }
+
+    c.JSON(http.StatusOK, gin.H{"status": "success", "message": "Data absensi siswa berhasil dihapus"})
+}
+
+

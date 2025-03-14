@@ -1,7 +1,6 @@
 <template>
   <div>
-    <NavAdmin v-if="userRole === 'admin'" />
-    <Navbar v-else />
+    <Navnew />
     <div class="schedule-container">
       <h2>Semua Jadwal</h2>
 
@@ -38,14 +37,12 @@
 <script>
 import axios from "axios";
 import ModalJadwal from '@/components/ModalJadwal.vue';
-import Navbar from '@/components/Navbar.vue';
-import NavAdmin from "../components/NavAdmin.vue";
+import Navnew from '@/components/Navnew.vue';
 
 export default {
   components: {
     ModalJadwal,
-    Navbar,
-    NavAdmin
+    Navnew,
   },
   data() {
     return {
