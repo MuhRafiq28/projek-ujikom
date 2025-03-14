@@ -47,6 +47,8 @@ func RegisterRoutes(r *gin.Engine) {
 		api.POST("/absensi", controllers.CreateAbsensi)
 		api.GET("/rekap-absensi/nama/:nama", controllers.GetRekapAbsensiByNama)
 		api.DELETE("/rekap-absensi/:id", controllers.DeleteAbsensiByID)   
+		api.DELETE("/absensi/all", controllers.DeleteAllAbsensi)
+
 		
 		
 

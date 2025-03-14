@@ -134,4 +134,16 @@ func DeleteAbsensiByNama(c *gin.Context) {
     c.JSON(http.StatusOK, gin.H{"status": "success", "message": "Data absensi siswa berhasil dihapus"})
 }
 
+// Hapus semua data absensi
+func DeleteAllAbsensi(c *gin.Context) {
+	result := database.DB.Exec("DELETE FROM absensis")
+
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Gagal menghapus semua data absensi"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"status": "success", "message": "Semua data absensi berhasil dihapus"})
+}
+
 

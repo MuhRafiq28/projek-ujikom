@@ -40,6 +40,8 @@ func ConnectDatabase() {
 
 	// Migrasi model ke database
 	err = db.AutoMigrate(&models.User{}, &models.Schedule{}, &models.Guru{},&models.Izin{},&models.Siswa{},&models.Absensi{})
+	
+
 	if err != nil {
 		log.Fatal("Failed to migrate database:", err)
 	}

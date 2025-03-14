@@ -26,6 +26,7 @@
         </button>
       </div>
 
+
       <!-- Tabel Siswa -->
       <table class="table table-striped table-bordered">
   <thead>
@@ -60,6 +61,11 @@
     </tr>
   </tbody>
 </table>
+<div>
+        <button @click="hapusSemuaAbsensi" :disabled="loading">
+  Hapus Semua Absensi
+</button>
+  </div>
 
 
       <!-- Modal untuk menampilkan detail absensi -->
@@ -70,6 +76,7 @@
         @close="showModalFlag = false"
       />
     </div>
+    
   </div>
 </template>
 
@@ -156,6 +163,31 @@ export default {
         this.absensiSiswa = [];
       }
     },
+    async hapusSemuaAbsensi() {
+  this.loading = true; // Tombol dikunci saat proses berlangsung
+  try {
+    const response = await axios.delete("http://localhost:8080/api/absensi/all");
+
+    this.$toast.success("Semua absensi berhasil dihapus!", {
+      position: "top-right",
+      timeout: 3000
+    });
+
+    await this.fetchAllSiswa(); // Perbarui data agar tampilan langsung berubah
+
+  } catch (error) {
+    console.error("Error submitting absensi:", error);
+    this.$toast.error("Gagal menghapus absensi", {
+      position: "top-right",
+      timeout: 3000
+    });
+
+  } finally {
+    this.loading = false; // **Pastikan tombol bisa diklik lagi**
+  }
+},
+
+
   },
 };
 </script>
@@ -267,6 +299,25 @@ export default {
 
 .nama-siswa:hover::after {
   width: 100%;
+}
+
+button {
+  padding: 10px 15px;
+  background-color: red;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 10px;
+}
+button:disabled {
+  background-color: gray;
+  cursor: not-allowed;
+}
+.success {
+  color: green;
+}
+.error {
+  color: red;
 }
 </style>
 
