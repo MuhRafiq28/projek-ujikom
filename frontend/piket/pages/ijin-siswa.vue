@@ -4,7 +4,7 @@
     <div class="container">
       <div class="form-container">
         <div class="image-container">
-          <img src="/images/IZIN.jpg" alt="Izin Illustration" />
+          <img src="/images/inspirasi-logo.png" alt="Izin Illustration" />
         </div>
         <div class="form-content">
           <h1>Buat Izin</h1>
@@ -15,20 +15,11 @@
               <option value="Keluar">Keluar</option>
               <option value="Masuk">Masuk</option>
               <option value="Terlambat">Terlambat</option>
-              <option value="Pulang Lebih Cepat">Pulang Lebih Cepat</option>
-              <option value="Ada Urusan Penting">Ada Urusan Penting</option>
+              <option value="Pulang Cepat">Pulang Lebih Cepat</option>
             </select>
             <button type="submit">Tambah Izin</button>
           </form>
         </div>
-      </div>
-    </div>
-
-    <!-- Modal Notifikasi -->
-    <div v-if="showModal" class="modal-overlay">
-      <div class="modal-content">
-        <p>{{ modalMessage }}</p>
-        <button @click="showModal = false">Tutup</button>
       </div>
     </div>
   </div>
@@ -51,12 +42,18 @@ export default {
     async tambahIzin() {
       try {
         await axios.post("http://localhost:8080/api/izin", this.izinBaru);
-        this.izinBaru = { nama: "", alasan: "", status: "Keluar" };
-        this.modalMessage = "✅ Izin berhasil ditambahkan!";
+
+        this.$toast.success("Absensi berhasil disimpan!", {
+          position: "top-right",
+          timeout: 3000,
+        });
       } catch (error) {
-        this.modalMessage = "❌ Gagal menambahkan izin.";
+        this.$toast.error("Gagal menyimpan absensi", {
+          position: "top-right",
+          timeout: 3000,
+        });
       }
-      this.showModal = true;
+
     },
   },
 };

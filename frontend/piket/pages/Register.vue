@@ -18,7 +18,7 @@
           </form>
         </div>
         <div class="image-container">
-          <img src="/images/IZIN.jpg" alt="Image" />
+          <img src="/images/inspirasi-logo.png" alt="Image" />
         </div>
       </div>
 
@@ -75,7 +75,10 @@ export default {
           password: this.password,
         });
 
-        this.message = "Berhasil Membuat Akun";
+        this.$toast.success("Akun berhasil dibuat!", {
+      position: "top-right",
+      timeout: 3000
+    });
         this.error = "";
         this.showSuccessModal = true;
         this.showErrorModal = false;
@@ -101,7 +104,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 100px;
+  margin-top: 140px;
 
 }
 
@@ -109,7 +112,7 @@ export default {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  max-width: 900px;
+  max-width: 700px;
   width: 100%;
   background: #fff;
   border-radius: 15px;

@@ -76,7 +76,7 @@
         @close="showModalFlag = false"
       />
     </div>
-    
+
   </div>
 </template>
 
@@ -168,7 +168,7 @@ export default {
   try {
     const response = await axios.delete("http://localhost:8080/api/absensi/all");
 
-    this.$toast.success("Semua absensi berhasil dihapus!", {
+    this.$toast.success("Rekap absensi berhasil dihapus!", {
       position: "top-right",
       timeout: 3000
     });
@@ -176,7 +176,7 @@ export default {
     await this.fetchAllSiswa(); // Perbarui data agar tampilan langsung berubah
 
   } catch (error) {
-    console.error("Error submitting absensi:", error);
+    console.error("Error delete absensi:", error);
     this.$toast.error("Gagal menghapus absensi", {
       position: "top-right",
       timeout: 3000

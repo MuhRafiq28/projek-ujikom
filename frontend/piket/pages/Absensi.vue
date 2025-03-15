@@ -6,13 +6,29 @@
 
       <!-- Filter Dropdown for Jurusan and Kelas -->
       <div class="filter-container">
-        <select v-model="selectedKelas" @change="fetchSiswa" class="form-select">
+        <select
+          v-model="selectedKelas"
+          @change="fetchSiswa"
+          class="form-select"
+        >
           <option value="">Semua Kelas</option>
-          <option v-for="kelas in kelasList" :key="kelas" :value="kelas">{{ kelas }}</option>
+          <option v-for="kelas in kelasList" :key="kelas" :value="kelas">
+            {{ kelas }}
+          </option>
         </select>
-        <select v-model="selectedJurusan" @change="fetchSiswa" class="form-select">
+        <select
+          v-model="selectedJurusan"
+          @change="fetchSiswa"
+          class="form-select"
+        >
           <option value="">Semua Jurusan</option>
-          <option v-for="jurusan in jurusanList" :key="jurusan" :value="jurusan">{{ jurusan }}</option>
+          <option
+            v-for="jurusan in jurusanList"
+            :key="jurusan"
+            :value="jurusan"
+          >
+            {{ jurusan }}
+          </option>
         </select>
       </div>
 
@@ -31,9 +47,15 @@
             <td>{{ index + 1 }}</td>
             <td>{{ absensi.nama }}</td>
             <td>{{ absensi.kelas }}</td>
-            <td :class="getJurusanClass(absensi.jurusan)">{{ absensi.jurusan }}</td>
+            <td :class="getJurusanClass(absensi.jurusan)">
+              {{ absensi.jurusan }}
+            </td>
             <td>
-              <select v-model="absensi.status" class="form-select" :class="getStatusClass(absensi.status)">
+              <select
+                v-model="absensi.status"
+                class="form-select"
+                :class="getStatusClass(absensi.status)"
+              >
                 <option value="Hadir">Hadir</option>
                 <option value="Sakit">Sakit</option>
                 <option value="Izin">Izin</option>
@@ -50,86 +72,106 @@
 </template>
 
 <script>
-import axios from 'axios';
-import Navnew from '../components/Navnew.vue';
+import axios from "axios";
+import Navnew from "../components/Navnew.vue";
 
 export default {
   components: {
-    Navnew
+    Navnew,
   },
   data() {
     return {
       absensiList: [],
-      kelasList: ['10A', '10B', '10C', '11A', '11B', '11C', '12A', '12B', '12C'],
-      jurusanList: ['RPL', 'MPLB', 'PH', 'TO'],
-      selectedKelas: '',
-      selectedJurusan: ''
+      kelasList: [
+        "10A",
+        "10B",
+        "10C",
+        "11A",
+        "11B",
+        "11C",
+        "12A",
+        "12B",
+        "12C",
+      ],
+      jurusanList: ["RPL", "MPLB", "PH", "TO"],
+      selectedKelas: "",
+      selectedJurusan: "",
     };
   },
   computed: {
     filteredAbsensi() {
-      return this.absensiList.filter(siswa => {
-        const matchesKelas = !this.selectedKelas || siswa.kelas === this.selectedKelas;
-        const matchesJurusan = !this.selectedJurusan || siswa.jurusan === this.selectedJurusan;
+      return this.absensiList.filter((siswa) => {
+        const matchesKelas =
+          !this.selectedKelas || siswa.kelas === this.selectedKelas;
+        const matchesJurusan =
+          !this.selectedJurusan || siswa.jurusan === this.selectedJurusan;
         return matchesKelas && matchesJurusan;
       });
-    }
+    },
   },
   methods: {
     async fetchSiswa() {
       try {
-        const response = await axios.get('http://localhost:8080/api/siswa');
+        const response = await axios.get("http://localhost:8080/api/siswa");
         this.absensiList = response.data.map((siswa) => ({
           siswa_id: siswa.id,
           nama: siswa.nama,
           kelas: siswa.kelas,
           jurusan: siswa.jurusan,
-          status: 'Hadir',
-          tanggal: new Date().toISOString().split('T')[0]
+          status: "Hadir",
+          tanggal: new Date().toISOString().split("T")[0],
         }));
       } catch (error) {
-        console.error('Error fetching siswa:', error);
+        console.error("Error fetching siswa:", error);
       }
     },
     getStatusClass(status) {
-      if (status === 'Sakit') return 'status-sakit';
-      if (status === 'Izin') return 'status-izin';
-      if (status === 'Alfa') return 'status-alfa';
-      return '';
+      if (status === "Sakit") return "status-sakit";
+      if (status === "Izin") return "status-izin";
+      if (status === "Alfa") return "status-alfa";
+      return "";
     },
     getJurusanClass(jurusan) {
       switch (jurusan) {
-        case 'RPL': return 'text-RPL';
-        case 'PH': return 'text-PH';
-        case 'MPLB': return 'text-MPLB';
-        case 'TO': return 'text-TO';
-        default: return '';
+        case "RPL":
+          return "text-RPL";
+        case "PH":
+          return "text-PH";
+        case "MPLB":
+          return "text-MPLB";
+        case "TO":
+          return "text-TO";
+        default:
+          return "";
       }
     },
     async submitAbsensi() {
       try {
         console.log("Data yang dikirim:", this.absensiList);
-        await axios.post('http://localhost:8080/api/absensi', this.absensiList);
+        await axios.post("http://localhost:8080/api/absensi", this.absensiList);
 
         // Menampilkan notifikasi sukses
         this.$toast.success("Absensi berhasil disimpan!", {
           position: "top-right",
-          timeout: 3000
+          timeout: 3000,
         });
+
+        // Navigasi ke halaman home setelah sukses
+       // this.$router.push("/rekapAbsen");
       } catch (error) {
-        console.error('Error submitting absensi:', error);
+        console.error("Error submitting absensi:", error);
 
         // Menampilkan notifikasi error
         this.$toast.error("Gagal menyimpan absensi", {
           position: "top-right",
-          timeout: 3000
+          timeout: 3000,
         });
       }
-    }
+    },
   },
   mounted() {
     this.fetchSiswa();
-  }
+  },
 };
 </script>
 
@@ -162,7 +204,8 @@ export default {
   margin-top: 30px;
 }
 
-.table th, .table td {
+.table th,
+.table td {
   padding: 12px;
   text-align: left;
   border-bottom: 1px solid #ddd;
@@ -170,8 +213,8 @@ export default {
 }
 
 .table th {
-  color: #D5D5D5;
-  background: #96858F;
+  color: #d5d5d5;
+  background: #96858f;
 }
 
 .table td {

@@ -51,7 +51,7 @@
             <td>{{ formatTanggalWaktu(izin.waktu_keluar) }}</td>
             <td>{{ izin.waktu_masuk ? formatTanggalWaktu(izin.waktu_masuk) : "-" }}</td>
             <td>
-              <button class="btn-konfirmasi"
+              <button class="btn-konfirmasi mb-1"
                 v-if="izin.status === 'Keluar'"
                 @click="konfirmasiMasuk(izin.ID)"
               >
@@ -115,6 +115,12 @@ export default {
       try {
         await axios.put(`http://localhost:8080/api/izin/${id}/konfirmasi`);
         this.fetchIzin();
+        await axios.delete(`http://localhost:8080/api/izin/${id}`);
+        this.fetchIzin();
+        this.$toast.success("'Berhasil!!' Murid sudah di sekolah!!!", {
+          position: "top-right",
+          timeout: 3000,
+        });
       } catch (error) {
         console.error(
           "❌ Gagal mengonfirmasi masuk:",
@@ -130,6 +136,10 @@ export default {
       try {
         await axios.delete(`http://localhost:8080/api/izin/${id}`);
         this.fetchIzin();
+        this.$toast.success("Absensi berhasil disimpan!", {
+          position: "top-right",
+          timeout: 3000,
+        });
       } catch (error) {
         console.error(
           "❌ Gagal menghapus izin:",
@@ -223,6 +233,9 @@ td {
   padding: 12px;
   border-bottom: 1px solid #ddd;
   text-align: left;
+  text-align: center;
+  vertical-align: middle;
+
 }
 
 th {
@@ -246,4 +259,5 @@ th {
 .duplikasi {
   background-color: #fff3cd !important;
 }
+
 </style>
