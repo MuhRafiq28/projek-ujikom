@@ -2,11 +2,15 @@
   <div class="container">
     <Navnew />
 
-    <div class="content ">
+    <div class="content">
       <h1 class="title">Daftar Guru</h1>
       <div class="button-container" v-if="userRole === 'admin'">
-        <h1 class="title">Daftar Guru</h1>
         <button @click="openModal" class="button add-button">+ Tambah Guru</button>
+      </div>
+
+      <!-- Input Pencarian -->
+      <div class="search-container">
+        <input type="text" v-model="searchTerm" placeholder="Cari berdasarkan nama guru..." class="search-input" />
       </div>
 
       <div class="table-container mt-2">
@@ -21,7 +25,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(guru, index) in gurus" :key="guru.id" class="table-row">
+            <tr v-for="(guru, index) in filteredGurus" :key="guru.id" class="table-row">
               <td>{{ index + 1 }}</td>
               <td>{{ guru.nama }}</td>
               <td>{{ guru.kodeguru }}</td>
@@ -35,7 +39,7 @@
         </table>
       </div>
 
-      <p v-if="gurus.length === 0" class="no-data">Data guru tidak ditemukan.</p>
+      <p v-if="filteredGurus.length === 0" class="no-data">Data guru tidak ditemukan.</p>
 
       <ModalGuru :show="showModal" :isEdit="isEdit" :guruData="guruForm" @submit="handleSubmit" @close="closeModal" />
     </div>
@@ -53,9 +57,17 @@ export default {
       gurus: [],
       showModal: false,
       isEdit: false,
-      userRole: 'user', // Default value
-      guruForm: { id: null, nama: '', kodeguru: '', mapelguru: '' }
+      userRole: 'user',
+      guruForm: { id: null, nama: '', kodeguru: '', mapelguru: '' },
+      searchTerm: '' // Tambahkan pencarian
     };
+  },
+  computed: {
+    filteredGurus() {
+      return this.gurus.filter(guru =>
+        guru.nama.toLowerCase().includes(this.searchTerm.toLowerCase())
+      );
+    }
   },
   async mounted() {
     if (process.client) {
@@ -121,7 +133,6 @@ export default {
 </script>
 
 <style scoped>
-/* Membuat container memenuhi layar */
 .container {
   width: 100%;
   min-height: 100vh;
@@ -131,7 +142,6 @@ export default {
   padding: 20px;
 }
 
-/* Membuat konten memenuhi layar */
 .content {
   width: 100%;
   margin-top: 60px;
@@ -157,7 +167,6 @@ export default {
   color: #333;
 }
 
-/* Tombol */
 .button {
   padding: 10px 20px;
   border-radius: 8px;
@@ -178,7 +187,6 @@ export default {
   background-color: #2779bd;
 }
 
-/* Table dibuat penuh */
 .table-container {
   width: 100%;
   overflow-x: auto;
@@ -192,8 +200,8 @@ export default {
 
 th, td {
   padding: 12px 20px;
-  text-align: center; /* Rata tengah secara horizontal */
-  vertical-align: middle; /* Rata tengah secara vertikal */
+  text-align: center;
+  vertical-align: middle;
   font-size: 1rem;
 }
 
@@ -210,11 +218,24 @@ th {
   background-color: #f1f5f9;
 }
 
-/* Pesan jika data kosong */
 .no-data {
   text-align: center;
   color: #6b7280;
   font-size: 1.125rem;
   margin-top: 20px;
+}
+
+.search-container {
+  display: flex;
+  justify-content: flex-end;
+  margin: 10px 0;
+}
+
+.search-input {
+  padding: 10px;
+  width: 300px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
 }
 </style>

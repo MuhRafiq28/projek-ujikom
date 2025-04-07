@@ -1,7 +1,7 @@
 <template>
   <div v-if="show" class="modal-overlay" @click.self="$emit('close')">
-    <div class="modal-content">
-      <h3 class="mb-3">Rekap Absensi Siswa: {{ siswa.nama }}</h3>
+    <div id="rekap-absensi" class="modal-content">
+      <h3 class="mb-3">Riwayat Absensi: {{ siswa.nama }}</h3>
 
       <div v-if="absensi.length === 0">
         <p class="text-danger">Tidak ada data absensi yang tersedia untuk siswa ini.</p>
@@ -12,18 +12,21 @@
           <p class="nomor">{{ index + 1 }}</p>
           <p class="tanggal">{{ formatDate(rekap.tanggal) }}</p>
           <p :class="['status', getStatusClass(rekap.status)]">{{ rekap.status }}</p>
-          <button class="btn btn-danger btn-sm" @click="deleteAbsensi(rekap.id)">Hapus</button>
         </div>
       </div>
+      <div class="aksi-btn d-flex justify-content-center gap-3 mt-3">
+  <button class="btn btn-primary" v-if="absensi.length" @click="downloadPDF">Download PDF</button>
+  <button class="btn btn-secondary" @click="$emit('close')">Tutup</button>
+</div>
 
-      <button class="btn btn-danger mt-3" v-if="absensi.length" @click="deleteAllAbsensi">Hapus Semua Absensi</button>
-      <button class="btn btn-secondary mt-3" @click="$emit('close')">Tutup</button>
     </div>
   </div>
 </template>
 
 <script>
 import axios from "axios";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
 export default {
   props: {
@@ -93,11 +96,37 @@ export default {
         case 'hadir': return 'hadir';
         default: return '';
       }
+    },
+    async downloadPDF() {
+      const modalContent = document.getElementById("rekap-absensi");
+
+      if (!modalContent) {
+        console.error("Elemen modal tidak ditemukan!");
+        return;
+      }
+
+      try {
+        const canvas = await html2canvas(modalContent, {
+          scale: 2,
+          logging: false,
+          useCORS: true,
+        });
+
+        const imgData = canvas.toDataURL("image/png");
+        const pdf = new jsPDF("p", "mm", "a4");
+
+        const imgWidth = 190;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        pdf.addImage(imgData, "PNG", 10, 10, imgWidth, imgHeight);
+
+        pdf.save(`Rekap_Absensi_${this.siswa.nama}.pdf`);
+      } catch (error) {
+        console.error("Gagal membuat PDF:", error);
+      }
     }
   }
 };
 </script>
-
 
 <style scoped>
 .modal-overlay {
@@ -110,14 +139,14 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1050; /* Pastikan modal berada di atas navbar */
+  z-index: 1050;
 }
 
 .modal-content {
   background: white;
   padding: 20px;
   border-radius: 8px;
-  width: 700px; /* Modal lebih lebar */
+  width: 700px;
 }
 
 .text-danger {
@@ -127,10 +156,10 @@ export default {
 /* Tampilan absensi dalam bentuk grid */
 .absensi-container {
   display: grid;
-  grid-template-columns: repeat(5, 1fr); /* 5 kolom */
+  grid-template-columns: repeat(5, 1fr);
   gap: 10px;
-  max-height: 400px; /* Sesuaikan dengan ukuran yang diinginkan */
-  overflow-y: auto; /* Agar bisa scroll ke bawah jika data lebih banyak */
+  max-height: 400px;
+  overflow-y: auto;
 }
 
 .absensi-card {
@@ -138,7 +167,7 @@ export default {
   padding: 10px;
   border-radius: 6px;
   text-align: center;
-  min-height: 100px; /* Tentukan tinggi minimum untuk setiap card */
+  min-height: 100px;
 }
 
 .nomor {
@@ -155,7 +184,7 @@ export default {
   font-weight: bold;
   padding: 5px;
   border-radius: 5px;
-  color: white; /* Teks warna putih untuk kontras */
+  color: white;
 }
 
 /* Warna berdasarkan status */
@@ -165,82 +194,7 @@ export default {
 
 .izin {
   background-color: yellow;
-  color: black; /* Warna teks hitam untuk kontras dengan latar belakang kuning */
-}
-
-.alfa {
-  background-color: red;
-}
-
-.hadir {
-  background-color: green;
-}
-
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.modal-content {
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  width: 700px; /* Modal lebih lebar */
-}
-
-.text-danger {
-  color: red;
-}
-
-/* Tampilan absensi dalam bentuk grid */
-.absensi-container {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr); /* 5 kolom */
-  gap: 10px;
-  max-height: 400px; /* Sesuaikan dengan ukuran yang diinginkan */
-  overflow-y: auto; /* Agar bisa scroll ke bawah jika data lebih banyak */
-}
-
-.absensi-card {
-  background: #f8f9fa;
-  padding: 10px;
-  border-radius: 6px;
-  text-align: center;
-  min-height: 100px; /* Tentukan tinggi minimum untuk setiap card */
-}
-
-.nomor {
-  font-weight: bold;
-}
-
-.tanggal {
-  font-size: 0.9em;
-  color: #555;
-}
-
-.status {
-  font-size: 1em;
-  font-weight: bold;
-  padding: 5px;
-  border-radius: 5px;
-  color: white; /* Teks warna putih untuk kontras */
-}
-
-/* Warna berdasarkan status */
-.sakit {
-  background-color: blue;
-}
-
-.izin {
-  background-color: yellow;
-  color: black; /* Warna teks hitam untuk kontras dengan latar belakang kuning */
+  color: black;
 }
 
 .alfa {

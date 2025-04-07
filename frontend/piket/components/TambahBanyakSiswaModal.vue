@@ -13,13 +13,19 @@
         </div>
       </div>
 
-      <!-- Input Jurusan dan Kelas hanya muncul jika form lebih dari 5 -->
-      <div v-if="siswaList.length > 4" class="input-group">
+      <!-- Input Jurusan dan Kelas (dropdown) -->
+      <div v-if="siswaList.length > 1" class="input-group">
         <label>Jurusan:</label>
-        <input type="text" v-model="jurusan" placeholder="Masukkan jurusan" />
+        <select v-model="jurusan">
+          <option disabled value="">Pilih Jurusan</option>
+          <option v-for="item in jurusanOptions" :key="item" :value="item">{{ item }}</option>
+        </select>
 
         <label>Kelas:</label>
-        <input type="text" v-model="kelas" placeholder="Masukkan kelas" />
+        <select v-model="kelas">
+          <option disabled value="">Pilih Kelas</option>
+          <option v-for="item in kelasOptions" :key="item" :value="item">{{ item }}</option>
+        </select>
 
         <button class="apply-btn" @click="applyJurusanKelas">Terapkan ke Semua</button>
       </div>
@@ -29,8 +35,17 @@
           <div v-for="(siswa, index) in siswaList" :key="index" class="form-item">
             <input v-model="siswa.nis" placeholder="NIS" required />
             <input v-model="siswa.nama" placeholder="Nama" required />
-            <input v-model="siswa.jurusan" placeholder="Jurusan" required />
-            <input v-model="siswa.kelas" placeholder="Kelas" required />
+
+            <select v-model="siswa.jurusan" required>
+              <option disabled value="">Pilih Jurusan</option>
+              <option v-for="item in jurusanOptions" :key="item" :value="item">{{ item }}</option>
+            </select>
+
+            <select v-model="siswa.kelas" required>
+              <option disabled value="">Pilih Kelas</option>
+              <option v-for="item in kelasOptions" :key="item" :value="item">{{ item }}</option>
+            </select>
+
             <button type="button" class="delete-btn" @click="removeSiswa(index)">Hapus</button>
           </div>
         </div>
@@ -38,8 +53,17 @@
           <div v-for="(siswa, index) in siswaList" :key="index" class="form-group">
             <input v-model="siswa.nis" placeholder="NIS" required />
             <input v-model="siswa.nama" placeholder="Nama" required />
-            <input v-model="siswa.jurusan" placeholder="Jurusan" required />
-            <input v-model="siswa.kelas" placeholder="Kelas" required />
+
+            <select v-model="siswa.jurusan" required>
+              <option disabled value="">Pilih Jurusan</option>
+              <option v-for="item in jurusanOptions" :key="item" :value="item">{{ item }}</option>
+            </select>
+
+            <select v-model="siswa.kelas" required>
+              <option disabled value="">Pilih Kelas</option>
+              <option v-for="item in kelasOptions" :key="item" :value="item">{{ item }}</option>
+            </select>
+
             <button type="button" class="delete-btn" @click="removeSiswa(index)">Hapus</button>
           </div>
         </div>
@@ -63,7 +87,9 @@ export default {
       jumlahSiswa: 1,
       siswaList: [],
       jurusan: '',
-      kelas: ''
+      kelas: '',
+      jurusanOptions: ['RPL', 'MPLB', 'PH', 'TO'],
+      kelasOptions: ['10A', '10B', '10C', '11A', '11B', '11C', '12A', '12B', '12C']
     };
   },
   methods: {
@@ -97,12 +123,19 @@ export default {
     async submitForm() {
       try {
         const response = await axios.post('http://localhost:8080/api/siswa/batch', this.siswaList);
-        // Tampilkan notifikasi sukses
         this.$toast.success(response.data.message || "Data siswa berhasil ditambahkan!");
         this.$emit('refreshData');
         this.closeModal();
       } catch (error) {
-        alert('Terjadi kesalahan: ' + (error.response?.data?.error || error.message));
+        const errorMessage = error.response?.data?.error || error.message;
+        if (error.response?.data?.error === "Semua NIS sudah terdaftar") {
+          const existingNIS = error.response.data.existing.map(siswa => siswa.nis).join(', ');
+          this.$toast.error(`Semua NIS sudah terdaftar. NIS yang sudah ada: ${existingNIS} ubah NIS`);
+        } else if (error.response?.data?.error?.includes("duplikat")) {
+          this.$toast.error(`NIS duplikat: ${error.response.data.nis}`);
+        } else {
+          this.$toast.error(`Terjadi kesalahan: ${errorMessage}`);
+        }
       }
     },
     closeModal() {
@@ -160,8 +193,9 @@ export default {
 .input-group {
   margin-bottom: 15px;
   display: flex;
-  justify-content: center; /* Pusatkan secara horizontal */
-  align-items: center; /* Pusatkan secara vertikal */
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
 }
 
 .input-wrapper {
@@ -170,7 +204,8 @@ export default {
   gap: 10px;
 }
 
-input {
+input,
+select {
   padding: 8px;
   width: 100%;
   border: 1px solid #ccc;
@@ -197,7 +232,6 @@ input {
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  margin-top: 8px;
 }
 
 .apply-btn:hover {

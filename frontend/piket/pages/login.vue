@@ -57,8 +57,10 @@ export default {
             this.$router.push('/homenew');
           } else if (role === 'staf') {
             this.$router.push('/home-staf');
+          } else if (role === 'siswa') {
+            this.$router.push('/siswa/homesiswa'); // Redirect ke halaman siswa
           } else {
-            this.$router.push('/homenew');
+            this.$router.push('/homenew'); // Default redirect
           }
         } else {
           alert('Login gagal, token tidak ditemukan.');

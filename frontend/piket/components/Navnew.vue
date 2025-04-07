@@ -12,15 +12,16 @@
       </button>
       <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
         <ul class="navbar-nav">
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="absensiDropdown" role="button" data-bs-toggle="dropdown">
-              <i class="fas fa-clipboard-list"></i> Absensi
-            </a>
-            <ul class="dropdown-menu">
-              <li><NuxtLink class="dropdown-item" to="/absensi"><i class="fas fa-user-check"></i> Absensi Siswa</NuxtLink></li>
-              <li><NuxtLink class="dropdown-item" to="/rekapAbsen"><i class="fas fa-chart-bar"></i> Rekap Absensi</NuxtLink></li>
-            </ul>
-          </li>
+          <li class="nav-item dropdown" v-if="role !== 'admin'">
+  <a class="nav-link dropdown-toggle" href="#" id="absensiDropdown" role="button" data-bs-toggle="dropdown">
+    <i class="fas fa-clipboard-list"></i> Absensi
+  </a>
+  <ul class="dropdown-menu">
+    <li><NuxtLink class="dropdown-item" to="/absensi"><i class="fas fa-user-check"></i> Absensi Siswa</NuxtLink></li>
+    <li><NuxtLink class="dropdown-item" to="/rekapAbsen"><i class="fas fa-chart-bar"></i> Rekap Absensi</NuxtLink></li>
+  </ul>
+</li>
+
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="siswaDropdown" role="button" data-bs-toggle="dropdown">
               <i class="fas fa-user-graduate"></i> Siswa

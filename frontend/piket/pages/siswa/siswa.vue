@@ -2,98 +2,98 @@
   <div>
     <Navnew />
 
-  <div class="container" style="margin-top: 80px;">
-    <h2 class="title">Data Siswa</h2>
+    <div class="container" style="margin-top: 80px;">
+      <h2 class="title">Data Siswa</h2>
 
-    <!-- Filter -->
-    <div class="filter-container">
-      <div class="filter-group">
-        <label>Jurusan</label>
-        <select v-model="selectedJurusan" @change="fetchSiswa">
-          <option value="">Semua</option>
-          <option v-for="jurusan in jurusanList" :key="jurusan" :value="jurusan">
-            {{ jurusan }}
-          </option>
-        </select>
+      <!-- Filter -->
+      <div class="filter-container">
+        <div class="filter-group">
+          <label>Jurusan</label>
+          <select v-model="selectedJurusan" @change="fetchSiswa">
+            <option value="">Semua</option>
+            <option v-for="jurusan in jurusanList" :key="jurusan" :value="jurusan">
+              {{ jurusan }}
+            </option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Kelas</label>
+          <select v-model="selectedKelas" @change="fetchSiswa">
+            <option value="">Semua</option>
+            <option v-for="kelas in kelasList" :key="kelas" :value="kelas">
+              {{ kelas }}
+            </option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Cari Nama</label>
+          <input type="text" v-model="searchNama" @input="fetchSiswa" placeholder="Cari berdasarkan nama..." />
+        </div>
+        <button @click="resetFilter" class="btn-refresh">
+          <i class="fas fa-sync-alt"></i>
+        </button>
       </div>
-      <div class="filter-group">
-        <label>Kelas</label>
-        <select v-model="selectedKelas" @change="fetchSiswa">
-          <option value="">Semua</option>
-          <option v-for="kelas in kelasList" :key="kelas" :value="kelas">
-            {{ kelas }}
-          </option>
-        </select>
+
+      <!-- Tambah Siswa Button -->
+      <button @click="isModalVisible = true" class="btn-add">Tambah Siswa</button>
+      <TambahBanyakSiswaModal :isVisible="isModalVisible" @close="isModalVisible = false" @refreshData="fetchSiswa" />
+
+      <!-- Tabel -->
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Nama</th>
+              <th>NIS</th>
+              <th>Jurusan</th>
+              <th>Kelas</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(siswa, index) in siswaList" :key="siswa.id">
+              <td>{{ index + 1 }}</td>
+              <td>{{ siswa.nama }}</td>
+              <td>{{ siswa.nis }}</td>
+              <td>{{ siswa.jurusan }}</td>
+              <td>{{ siswa.kelas }}</td>
+              <td>
+                <button @click="editSiswa(siswa)">Edit</button>
+                <button @click="deleteSiswa(siswa.id)">Hapus</button>
+              </td>
+            </tr>
+            <tr v-if="siswaList.length === 0">
+              <td colspan="6">Tidak ada data siswa.</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
-      <button @click="resetFilter" class="btn-refresh">
-        <i class="fas fa-sync-alt"></i>
-      </button>
+
+      <!-- Modal Tambah/Edit -->
+      <div v-if="isFormVisible" class="modal-overlay">
+        <div class="modal-content">
+          <h3>{{ formTitle }}</h3>
+          <form @submit.prevent="submitForm">
+            <input type="text" v-model="formData.nama" placeholder="Nama" required />
+            <input type="text" v-model="formData.nis" placeholder="NIS" required />
+            <select v-model="formData.jurusan">
+              <option v-for="jurusan in jurusanList" :key="jurusan" :value="jurusan">
+                {{ jurusan }}
+              </option>
+            </select>
+            <select v-model="formData.kelas">
+              <option v-for="kelas in kelasList" :key="kelas" :value="kelas">
+                {{ kelas }}
+              </option>
+            </select>
+            <button type="submit">Simpan</button>
+            <button type="button" @click="closeForm">Batal</button>
+          </form>
+        </div>
+      </div>
     </div>
-
-    <!-- Tambah Siswa Button -->
-
-    <button @click="isModalVisible = true" class="btn-add">Tambah Siswa</button>
-
-    <!-- Modal Tambah Banyak Siswa -->
-    <TambahBanyakSiswaModal :isVisible="isModalVisible" @close="isModalVisible = false" @refreshData="fetchSiswa" />
-
-
-    <!-- Tabel -->
-    <div class="table-container">
-      <table>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Nama</th>
-            <th>NIS</th>
-            <th>Jurusan</th>
-            <th>Kelas</th>
-            <th>Aksi</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(siswa, index) in siswaList" :key="siswa.id">
-            <td>{{ index + 1 }}</td>
-            <td>{{ siswa.nama }}</td>
-            <td>{{ siswa.nis }}</td>
-            <td>{{ siswa.jurusan }}</td>
-            <td>{{ siswa.kelas }}</td>
-            <td>
-              <button @click="editSiswa(siswa)">Edit</button>
-              <button @click="deleteSiswa(siswa.id)">Hapus</button>
-            </td>
-          </tr>
-          <tr v-if="siswaList.length === 0">
-            <td colspan="6">Tidak ada data siswa.</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div v-if="isFormVisible" class="modal-overlay">
-  <div class="modal-content">
-    <h3>{{ formTitle }}</h3>
-    <form @submit.prevent="submitForm">
-      <input type="text" v-model="formData.nama" placeholder="Nama" required />
-      <input type="text" v-model="formData.nis" placeholder="NIS" required />
-      <select v-model="formData.jurusan">
-        <option v-for="jurusan in jurusanList" :key="jurusan" :value="jurusan">
-          {{ jurusan }}
-        </option>
-      </select>
-      <select v-model="formData.kelas">
-        <option v-for="kelas in kelasList" :key="kelas" :value="kelas">
-          {{ kelas }}
-        </option>
-      </select>
-      <button type="submit">Simpan</button>
-      <button type="button" @click="closeForm">Batal</button>
-    </form>
   </div>
-</div>
-
-  </div>
-</div>
-
 </template>
 
 <script>
@@ -111,11 +111,10 @@ export default {
     const siswaList = ref([])
     const selectedJurusan = ref('')
     const selectedKelas = ref('')
+    const searchNama = ref('')
     const isModalVisible = ref(false)
     const isFormVisible = ref(false)
     const isEditing = ref(false)
-
-
 
     const formData = ref({
       id: null,
@@ -125,7 +124,7 @@ export default {
       kelas: ''
     })
 
-    const jurusanList = ref(['RPL', 'MPLB', 'PH'])
+    const jurusanList = ref(['RPL', 'MPLB', 'PH', 'TO'])
     const kelasList = ref([
       '10A', '10B', '10C',
       '11A', '11B', '11C',
@@ -139,6 +138,7 @@ export default {
         let params = {}
         if (selectedJurusan.value) params.jurusan = selectedJurusan.value
         if (selectedKelas.value) params.kelas = selectedKelas.value
+        if (searchNama.value) params.nama = searchNama.value
 
         const response = await axios.get('http://localhost:8080/api/siswa', { params })
         siswaList.value = response.data || []
@@ -161,7 +161,6 @@ export default {
 
     const deleteSiswa = async (id) => {
       if (!confirm('Apakah Anda yakin ingin menghapus siswa ini?')) return
-
       try {
         await axios.delete(`http://localhost:8080/api/siswa/${id}`)
         fetchSiswa()
@@ -170,34 +169,25 @@ export default {
       }
     }
 
-
-
-
     const submitForm = async () => {
-  try {
-    if (isEditing.value) {
-      const response = await axios.put(`http://localhost:8080/api/siswa/${formData.value.id}`, formData.value)
-      siswaList.value = siswaList.value.map(siswa =>
-        siswa.id === formData.value.id ? { ...siswa, ...formData.value } : siswa
-      )
-      isEditing.value = false
-      isFormVisible.value = false
-      // Menggunakan alert untuk notifikasi
-      alert(response.data.message || "Data siswa berhasil diperbarui!")
-    } else {
-      const response = await axios.post("http://localhost:8080/api/siswa", formData.value)
-      siswaList.value.push(response.data)
-      alert("Siswa berhasil ditambahkan!")
+      try {
+        if (isEditing.value) {
+          const response = await axios.put(`http://localhost:8080/api/siswa/${formData.value.id}`, formData.value)
+          siswaList.value = siswaList.value.map(siswa =>
+            siswa.id === formData.value.id ? { ...siswa, ...formData.value } : siswa
+          )
+          alert(response.data.message || "Data siswa berhasil diperbarui!")
+        } else {
+          const response = await axios.post("http://localhost:8080/api/siswa", formData.value)
+          siswaList.value.push(response.data)
+          alert("Siswa berhasil ditambahkan!")
+        }
+        closeForm()
+      } catch (error) {
+        console.error("Gagal menyimpan data:", error)
+        alert("Gagal menyimpan data!")
+      }
     }
-    closeForm()
-  } catch (error) {
-    console.error("Gagal menyimpan data:", error)
-    alert("Gagal menyimpan data!")
-  }
-}
-
-
-
 
     const closeForm = () => {
       isFormVisible.value = false
@@ -206,6 +196,7 @@ export default {
     const resetFilter = () => {
       selectedJurusan.value = ''
       selectedKelas.value = ''
+      searchNama.value = ''
       fetchSiswa()
     }
 
@@ -215,6 +206,7 @@ export default {
       siswaList,
       selectedJurusan,
       selectedKelas,
+      searchNama,
       jurusanList,
       kelasList,
       isModalVisible,
@@ -233,8 +225,6 @@ export default {
   }
 }
 </script>
-
-
 
 <style scoped>
 .modal-overlay {
@@ -440,4 +430,22 @@ button:hover {
 .btn-add:hover {
   background-color: #218838;
 }
+
+/* Search input style tambahan */
+.filter-group input[type="text"] {
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  width: 100%;
+  font-size: 14px;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease;
+}
+
+.filter-group input[type="text"]:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+/* (Style lainnya tidak berubah, tetap seperti sebelumnya) */
 </style>

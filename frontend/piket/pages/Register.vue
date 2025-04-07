@@ -1,7 +1,6 @@
 <template>
   <div>
-
-    <Navnew/>
+    <Navnew />
 
     <div class="container">
       <div class="card">
@@ -14,9 +13,46 @@
             <label>Password:</label>
             <input type="password" v-model="password" required />
 
+            <label>Role:</label>
+            <select v-model="userRole" required>
+              <option value="siswa">Siswa</option>
+              <option value="staf">Staf</option>
+              <option value="admin">Admin</option>
+            </select>
+
+            <!-- Hanya tampil kalau role siswa -->
+            <div v-if="userRole === 'siswa'">
+              <div class="input-block">
+                <label>Jurusan:</label>
+                <select v-model="jurusan" required>
+                  <option value="">Pilih Jurusan</option>
+                  <option value="MPLB">MPLB</option>
+                  <option value="RPL">RPL</option>
+                  <option value="PH">PH</option>
+                </select>
+              </div>
+
+              <div class="input-block">
+                <label>Kelas:</label>
+                <select v-model="kelas" required>
+                  <option value="">Pilih Kelas</option>
+                  <option value="10A">Kelas XA</option>
+                  <option value="10B">Kelas XB</option>
+                  <option value="10C">Kelas XV</option>
+                  <option value="11A">Kelas XIA</option>
+                  <option value="11B">Kelas XIB</option>
+                  <option value="11C">Kelas XIC</option>
+                  <option value="12A">Kelas XIIA</option>
+                  <option value="12B">Kelas XIIB</option>
+                  <option value="12C">Kelas XIIC</option>
+                </select>
+              </div>
+            </div>
+
             <button type="submit">Buat</button>
           </form>
         </div>
+
         <div class="image-container">
           <img src="/images/inspirasi-logo.png" alt="Image" />
         </div>
@@ -47,7 +83,6 @@
 import axios from "axios";
 import Navnew from "~/components/Navnew.vue";
 
-
 export default {
   components: {
     Navnew,
@@ -60,12 +95,13 @@ export default {
       error: "",
       showSuccessModal: false,
       showErrorModal: false,
-      userRole: "user", // Default userRole
+      userRole: "siswa",
+      jurusan: "",
+      kelas: "",
     };
   },
   mounted() {
-    // Ambil peran user dari localStorage
-    this.userRole = localStorage.getItem("userRole") || "user";
+    this.userRole = localStorage.getItem("userRole") || "siswa";
   },
   methods: {
     async register() {
@@ -73,17 +109,24 @@ export default {
         const response = await axios.post("http://localhost:8080/api/register", {
           username: this.username,
           password: this.password,
+          role: this.userRole,
+          jurusan: this.userRole === "siswa" ? this.jurusan : null,
+          kelas: this.userRole === "siswa" ? this.kelas : null,
         });
 
         this.$toast.success("Akun berhasil dibuat!", {
-      position: "top-right",
-      timeout: 3000
-    });
-        this.error = "";
+          position: "top-right",
+          timeout: 3000,
+        });
+
         this.showSuccessModal = true;
         this.showErrorModal = false;
+
         this.username = "";
         this.password = "";
+        this.userRole = "siswa";
+        this.jurusan = "";
+        this.kelas = "";
       } catch (err) {
         this.error = "Gagal membuat akun";
         this.message = "";
@@ -104,14 +147,12 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 140px;
-
+  margin-top: 105px;
 }
 
 .card {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
   max-width: 700px;
   width: 100%;
   background: #fff;
@@ -123,6 +164,19 @@ export default {
 .form-container {
   width: 50%;
   padding-right: 20px;
+}
+
+.image-container {
+  width: 50%;
+  padding-left: 20px;
+}
+
+.image-container img {
+  width: 200px;
+  height: auto;
+  object-fit: cover;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
 h2 {
@@ -143,7 +197,7 @@ label {
   color: #555;
 }
 
-input {
+input, select {
   padding: 12px;
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -151,15 +205,15 @@ input {
   transition: all 0.3s ease;
 }
 
-input:focus {
+input:focus, select:focus {
   border-color: #3498db;
   box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
 }
 
-input:hover {
+input:hover, select:hover {
   border-color: #8e44ad;
   background-color: #f4f4f9;
-  transform: scale(1.05); /* Membesar input saat hover */
+  transform: scale(1.05);
 }
 
 button {
@@ -180,20 +234,6 @@ button:hover {
 
 button:active {
   transform: translateY(2px);
-}
-
-.image-container {
-  width: 50%;
-  padding-left: 20px;
-}
-
-.image-container img {
-  width: 100%;
-  height: auto;
-  max-height: 100%;
-  object-fit: cover;
-  border-radius: 10px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
 .modal {
@@ -233,23 +273,7 @@ button:active {
   transform: translateY(-2px);
 }
 
-@keyframes slideIn {
-  from {
-    transform: translateY(-20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+.input-block {
+  margin-bottom: 15px;
 }
 </style>

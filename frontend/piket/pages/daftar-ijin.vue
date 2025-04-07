@@ -11,9 +11,12 @@
         placeholder="Cari berdasarkan nama..."
         class="search-input"
       />
-
       <!-- Input Filter Bulan -->
+      <label for="bulan" class="search-label"
+        >Atau cari siswa yang ijin di bulan tertentu</label
+      >
       <input
+        id="bulan"
         type="month"
         v-model="searchMonth"
         class="search-month"
@@ -35,7 +38,7 @@
           <tr
             v-for="izin in filteredIzins"
             :key="izin.ID"
-            :class="{ 'duplikasi': isDuplicate(izin.nama) }"
+            :class="{ duplikasi: isDuplicate(izin.nama) }"
           >
             <td>{{ izin.nama }}</td>
             <td>{{ izin.alasan }}</td>
@@ -49,9 +52,14 @@
               {{ izin.status }}
             </td>
             <td>{{ formatTanggalWaktu(izin.waktu_keluar) }}</td>
-            <td>{{ izin.waktu_masuk ? formatTanggalWaktu(izin.waktu_masuk) : "-" }}</td>
             <td>
-              <button class="btn-konfirmasi mb-1"
+              {{
+                izin.waktu_masuk ? formatTanggalWaktu(izin.waktu_masuk) : "-"
+              }}
+            </td>
+            <td>
+              <button
+                class="btn-konfirmasi mb-1"
                 v-if="izin.status === 'Keluar'"
                 @click="konfirmasiMasuk(izin.ID)"
               >
@@ -87,7 +95,9 @@ export default {
   computed: {
     filteredIzins() {
       return this.izins.filter((izin) => {
-        const namaMatch = izin.nama.toLowerCase().includes(this.searchQuery.toLowerCase());
+        const namaMatch = izin.nama
+          .toLowerCase()
+          .includes(this.searchQuery.toLowerCase());
 
         if (!this.searchMonth) return namaMatch;
 
@@ -205,8 +215,14 @@ h1 {
   text-align: center;
 }
 
+.search-label {
+  text-align: left;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
 button {
-  background: linear-gradient(135deg, #9cc7e4, #6D7993);
+  background: linear-gradient(135deg, #9cc7e4, #6d7993);
   color: white;
   cursor: pointer;
   font-weight: bold;
@@ -235,11 +251,10 @@ td {
   text-align: left;
   text-align: center;
   vertical-align: middle;
-
 }
 
 th {
-  background-color: #96858F;
+  background-color: #96858f;
   font-weight: bold;
   color: white;
 }
@@ -259,5 +274,4 @@ th {
 .duplikasi {
   background-color: #fff3cd !important;
 }
-
 </style>

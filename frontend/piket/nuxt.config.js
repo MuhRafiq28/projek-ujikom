@@ -32,6 +32,11 @@ export default {
     { src: "~/plugins/toast.js", mode: "client" },
   ],
 
+
+
+
+
+
   modules: [
     '@nuxtjs/axios',
     'bootstrap-vue/nuxt',
