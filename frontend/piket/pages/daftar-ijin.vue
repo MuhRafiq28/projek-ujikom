@@ -1,87 +1,119 @@
 <template>
-  <div>
+  <div class="daftar-ijin">
     <Navnew />
     <div class="container">
       <h1>Daftar Izin Siswa</h1>
 
-      <!-- Input Pencarian -->
-      <input
-        type="text"
-        v-model="searchQuery"
-        placeholder="Cari berdasarkan nama..."
-        class="search-input"
-      />
-      <!-- Input Filter Bulan -->
-      <label for="bulan" class="search-label"
-        >Atau cari siswa yang ijin di bulan tertentu</label
-      >
-      <input
-        id="bulan"
-        type="month"
-        v-model="searchMonth"
-        class="search-month"
-      />
+      <!-- Input Filter -->
+      <div class="filter-row">
+        <input
+          type="text"
+          v-model="searchQuery"
+          placeholder="Cari nama siswa..."
+          class="search-input"
+        />
+        <input
+          type="month"
+          v-model="searchMonth"
+          class="search-month"
+        />
+      </div>
 
-      <!-- Tabel Izin -->
-      <table>
-        <thead>
-          <tr>
-            <th>Nama</th>
-            <th>Alasan</th>
-            <th>Status</th>
-            <th>Waktu Keluar</th>
-            <th>Waktu Masuk</th>
-            <th>Aksi</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            v-for="izin in filteredIzins"
-            :key="izin.ID"
-            :class="{ duplikasi: isDuplicate(izin.nama) }"
-          >
-            <td>{{ izin.nama }}</td>
-            <td>{{ izin.alasan }}</td>
-            <td
-              :class="{
-                'status-keluar': izin.status === 'Keluar',
-                'status-masuk': izin.status === 'Masuk',
-                'status-terlambat': izin.status === 'Terlambat',
-              }"
-            >
-              {{ izin.status }}
-            </td>
-            <td>{{ formatTanggalWaktu(izin.waktu_keluar) }}</td>
-            <td>
-              {{
-                izin.waktu_masuk ? formatTanggalWaktu(izin.waktu_masuk) : "-"
-              }}
-            </td>
-            <td>
-              <button
-                class="btn-konfirmasi mb-1"
-                v-if="izin.status === 'Keluar'"
-                @click="konfirmasiMasuk(izin.ID)"
+      <div class="content-row">
+        <!-- Tabel Izin -->
+        <div class="left-content">
+          <table>
+            <thead>
+              <tr>
+                <th>Nama</th>
+                <th>Alasan</th>
+                <th>Jurusan</th>
+                <th>Kelas</th>
+                <th>Status</th>
+                <th>Keluar</th>
+                <th>Masuk</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="izin in filteredIzins"
+                :key="izin.ID"
+                :class="{ duplikasi: isDuplicate(izin.nama) }"
               >
-                Konfirmasi Masuk
-              </button>
-              <button @click="hapusIzin(izin.ID)">Hapus</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+                <td>{{ izin.nama }}</td>
+                <td>{{ izin.alasan }}</td>
+                <td>{{ izin.jurusan }}</td>
+                <td>{{ izin.kelas }}</td>
+                <td
+                  :class="{
+                    'status-keluar': izin.status === 'Keluar',
+                    'status-masuk': izin.status === 'Masuk',
+                    'status-terlambat': izin.status === 'Terlambat',
+                    'status-pulang': izin.status === 'Pulang Lebih Cepat',
+                    'status-sudah-kembali': izin.status === 'Sudah Kembali',
+                  }"
+                >
+                  {{ izin.status }}
+                </td>
+                <td>
+  {{
+    izin.waktu_keluar
+      ? formatTanggalWaktu(izin.waktu_keluar)
+      : "-"
+  }}
+</td>
+<td>
+  {{
+    izin.waktu_masuk
+      ? formatTanggalWaktu(izin.waktu_masuk)
+      : "-"
+  }}
+</td>
+
+
+                <td>
+  <button v-if="izin.status === 'Keluar'" @click="konfirmasiMasuk(izin)">
+    Konfirmasi Masuk
+  </button>
+  <button @click="hapusIzin(izin.id)">Hapus</button>
+
+</td>
+
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Ringkasan -->
+        <div class="right-content">
+          <h2><i class="fas fa-chart-bar"></i> <span style="font-size: 12px;">Ringkasan Siswa</span></h2>
+          <div
+            class="card"
+            v-for="item in statistikIzin"
+            :key="`${item.nama}-${item.jurusan}-${item.kelas}`"
+          >
+            <h3><i class="fas fa-user"></i> {{ item.nama }}</h3>
+            <p style="font-size: 13px;">{{ item.jurusan }} - {{ item.kelas }}</p>
+            <ul>
+              <li v-for="(jumlah, status) in item.status" :key="status">
+                <i class="fas fa-check-circle"></i> {{ status }}: {{ jumlah }}
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import axios from "axios";
+import moment from "moment-timezone";
 import Navnew from "../components/Navnew.vue";
 
 export default {
-  components: {
-    Navnew,
-  },
+  components: { Navnew },
   data() {
     return {
       izins: [],
@@ -94,184 +126,217 @@ export default {
   },
   computed: {
     filteredIzins() {
-      return this.izins.filter((izin) => {
-        const namaMatch = izin.nama
-          .toLowerCase()
-          .includes(this.searchQuery.toLowerCase());
+      return this.izins
+        .filter((izin) => {
+          const namaMatch = izin.nama.toLowerCase().includes(this.searchQuery.toLowerCase());
 
-        if (!this.searchMonth) return namaMatch;
+          if (!this.searchMonth) return namaMatch;
 
-        const izinDate = new Date(izin.waktu_keluar);
-        const izinMonth = izinDate.toISOString().slice(0, 7); // Format YYYY-MM
-
-        return namaMatch && izinMonth === this.searchMonth;
+          const izinMonth = new Date(izin.waktu_keluar).toISOString().slice(0, 7);
+          return namaMatch && izinMonth === this.searchMonth;
+        })
+        .sort((a, b) => new Date(b.waktu_keluar) - new Date(a.waktu_keluar));
+    },
+    statistikIzin() {
+      const countMap = {};
+      this.izins.forEach((izin) => {
+        const key = `${izin.nama}|${izin.jurusan}|${izin.kelas}`;
+        if (!countMap[key]) {
+          countMap[key] = {
+            nama: izin.nama,
+            jurusan: izin.jurusan,
+            kelas: izin.kelas,
+            status: {},
+            total: 0,
+          };
+        }
+        countMap[key].status[izin.status] = (countMap[key].status[izin.status] || 0) + 1;
+        countMap[key].total += 1;
       });
+      return Object.values(countMap).filter((item) => item.total > 1);
     },
   },
   methods: {
-    async fetchIzin() {
-      try {
-        const response = await axios.get("http://localhost:8080/api/izin");
-        this.izins = response.data.data;
-      } catch (error) {
-        console.error("❌ Gagal mengambil data izin:", error);
-      }
-    },
-    async konfirmasiMasuk(id) {
-      if (!id) {
-        console.error("❌ ID izin tidak ditemukan di frontend!");
-        return;
-      }
-      try {
-        await axios.put(`http://localhost:8080/api/izin/${id}/konfirmasi`);
-        this.fetchIzin();
-        await axios.delete(`http://localhost:8080/api/izin/${id}`);
-        this.fetchIzin();
-        this.$toast.success("'Berhasil!!' Murid sudah di sekolah!!!", {
-          position: "top-right",
-          timeout: 3000,
-        });
-      } catch (error) {
-        console.error(
-          "❌ Gagal mengonfirmasi masuk:",
-          error.response?.data || error
-        );
-      }
-    },
-    async hapusIzin(id) {
-      if (!id) {
-        console.error("❌ ID izin tidak ditemukan di frontend!");
-        return;
-      }
-      try {
-        await axios.delete(`http://localhost:8080/api/izin/${id}`);
-        this.fetchIzin();
-        this.$toast.success("Absensi berhasil disimpan!", {
-          position: "top-right",
-          timeout: 3000,
-        });
-      } catch (error) {
-        console.error(
-          "❌ Gagal menghapus izin:",
-          error.response?.data || error
-        );
-      }
-    },
-    formatTanggalWaktu(waktu) {
-      if (!waktu) return "-";
-      const date = new Date(waktu);
-      return `${date.toLocaleDateString("id-ID", {
-        weekday: "long",
-        day: "2-digit",
-        month: "long",
-        year: "numeric",
-      })}, ${date.toLocaleTimeString("id-ID", {
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-      })}`;
-    },
-    isDuplicate(nama) {
-      return this.izins.filter((izin) => izin.nama === nama).length > 1;
-    },
+  async fetchIzin() {
+    try {
+      const response = await axios.get("http://localhost:8080/api/izin");
+      this.izins = response.data.data.sort((a, b) => new Date(b.waktu_keluar) - new Date(a.waktu_keluar));
+    } catch (error) {
+      console.error("❌ Gagal mengambil data izin:", error);
+    }
   },
+  async konfirmasiMasuk(izin) {
+    if (!izin || !izin.id) {
+      alert("ID izin tidak ditemukan");
+      return;
+    }
+
+    try {
+      await axios.put(`http://localhost:8080/api/izin/${izin.id}/konfirmasi`);
+      alert("Berhasil dikonfirmasi masuk");
+      this.fetchIzin(); // refresh data
+    } catch (err) {
+      alert("Gagal konfirmasi: " + (err.response?.data?.error || err.message));
+    }
+  },
+  async hapusIzin(id) {
+    try {
+      await axios.delete(`http://localhost:8080/api/izin/${id}`);
+      this.fetchIzin();
+      this.$toast?.success("🗑️ Izin berhasil dihapus.");
+    } catch (err) {
+      console.error("Gagal hapus:", err);
+    }
+  },
+
+  formatTanggalWaktu(waktu) {
+    // Format waktu dengan zona waktu Asia/Jakarta
+    return moment(waktu).tz("Asia/Bangkok").format("D/M/YYYY, HH:mm:ss");
+  },
+
+  isDuplicate(nama) {
+    return this.izins.filter((i) => i.nama === nama).length > 1;
+  },
+},
+
 };
 </script>
 
+
 <style scoped>
-body {
-  font-family: Arial, sans-serif;
-  background: #f4f4f4;
-  color: #333;
-  text-align: center;
-  padding: 20px;
-  margin: 0;
+.daftar-ijin {
+  display: flex;
+  margin-top: 60px;
 }
 
 .container {
-  margin: 0 auto;
-  background: white;
+  margin: auto;
   padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  margin-top: 70px;
-  text-align: center;
+  width: 100%;
+  max-width: 1200px;
 }
 
 h1 {
+  text-align: center;
   margin-bottom: 20px;
-  font-size: 24px;
+}
+
+.filter-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 20px;
+  padding-right: 150px;
+  padding-left: 150px;
 }
 
 .search-input,
 .search-month {
-  width: 100%;
-  padding: 12px;
+  flex: 1;
+  padding: 10px;
+  font-size: 16px;
   border-radius: 8px;
   border: 1px solid #ccc;
-  font-size: 16px;
-  margin: 5px 0;
-  display: block;
-  text-align: center;
+  width: 50px;
 }
 
-.search-label {
-  text-align: left;
-  margin-top: 10px;
-  font-weight: bold;
+.content-row {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
 }
 
-button {
-  background: linear-gradient(135deg, #9cc7e4, #6d7993);
-  color: white;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background 0.3s;
-  border: none;
-  padding: 10px 15px;
-  border-radius: 8px;
+.left-content {
+  flex: 1;
+  overflow-x: auto;
 }
 
-button:hover {
-  background: #555;
+.right-content {
+  width: 200px;
+  min-width: 200px;
+  background: #f9f9f9;
+  padding: 15px;
+  border-radius: 10px;
+  height: fit-content;
 }
 
 table {
   width: 100%;
-  margin: 20px 0;
   border-collapse: collapse;
-  border-radius: 10px;
-  overflow: hidden;
+  margin-bottom: 30px;
 }
 
 th,
 td {
-  padding: 12px;
-  border-bottom: 1px solid #ddd;
-  text-align: left;
+  padding: 10px;
   text-align: center;
-  vertical-align: middle;
+  border-bottom: 1px solid #ccc;
 }
 
 th {
-  background-color: #96858f;
-  font-weight: bold;
+  background-color: #6d7993;
   color: white;
 }
 
-.status-keluar {
-  color: #d9534f;
-}
-
-.status-masuk {
-  color: #5cb85c;
-}
-
-.status-terlambat {
-  color: #f0ad4e;
-}
-
 .duplikasi {
-  background-color: #fff3cd !important;
+  background-color: #fff3cd;
+}
+
+.status-keluar {
+  color: #dc3545;
+}
+.status-masuk {
+  color: #28a745;
+}
+.status-terlambat {
+  color: #ffc107;
+}
+.status-pulang {
+  color: #007bff;
+}
+.status-sudah-kembali {
+  color: #17a2b8;
+}
+
+button {
+  padding: 6px 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  margin: 2px 0;
+}
+
+.btn-konfirmasi {
+  background-color: #5cb85c;
+  color: white;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+.card {
+  background: white;
+  border-left: 5px solid #6d7993;
+  padding: 10px 15px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+}
+
+.card h3 {
+  margin-bottom: 8px;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.card ul {
+  list-style: none;
+  padding: 0;
+}
+
+.card li {
+  margin: 5px 0;
+  font-size: 13px;
 }
 </style>

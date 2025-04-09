@@ -3,7 +3,6 @@
     <div>
       <Navnew />
       <div class="container">
-
         <h1 style="margin-left: 380px;">Absen Siswa</h1>
 
         <!-- Filter -->
@@ -79,27 +78,25 @@
       </div>
     </div>
 
-<!-- Menu Grafik Gabungan Jurusan & Kelas -->
-<div class="menu-gerafik">
-  <div
-    class="menu-item"
-    v-for="jurusan in jurusanList"
-    :key="jurusan"
-  >
-    <div v-for="kelas in kelasList" :key="jurusan + kelas" class="menu-link" style="cursor: default;">
-      <strong>{{ jurusan }} - {{ kelas }}</strong>
-      <ul style="list-style: none; padding-left: 0; margin-top: 8px; font-size: 14px;">
-        <li>Hadir: {{ countByStatusGabungan(jurusan, kelas, 'hadir') }}</li>
-        <li>Sakit: {{ countByStatusGabungan(jurusan, kelas, 'sakit') }}</li>
-        <li>Izin: {{ countByStatusGabungan(jurusan, kelas, 'izin') }}</li>
-        <li>Alfa: {{ countByStatusGabungan(jurusan, kelas, 'alfa') }}</li>
-      </ul>
+    <!-- Menu Grafik Gabungan Jurusan & Kelas -->
+    <div class="menu-gerafik">
+      <!-- Sidebar statistik -->
+<div class="w-full lg:w-1/4 p-4 bg-gray-100 rounded-xl shadow-md">
+  <i class="fas fa-chart-bar mr-2"></i>
+  <span>Statistik Kehadiran</span>
+  <div class="space-y-6 max-h-[600px] overflow-y-auto">
+    <div v-for="(data, index) in dataStatistikGabungan" :key="index">
+      <p class="font-semibold text-gray-700 mb-1">{{ data.label }}</p>
+      <GrafikStatistik :dataStatistik="[data]" />
     </div>
   </div>
 </div>
 
 
-  </div>
+</div>
+
+      </div>
+
 </template>
 
 <script>
@@ -108,11 +105,13 @@ import Navnew from "../components/Navnew.vue";
 import axios from "axios";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import GrafikStatistik from "@/components/GrafikStatistik.vue";
 
 export default {
   components: {
     RekapAbsensiModal,
     Navnew,
+    GrafikStatistik,
   },
   data() {
     return {
@@ -127,19 +126,50 @@ export default {
       loading: false,
     };
   },
+
+
   computed: {
-    filteredSiswa() {
-      return this.rekapAbsensi.filter(siswa => {
-        return (
-          (!this.filterJurusan || siswa.jurusan === this.filterJurusan) &&
-          (!this.filterKelas || siswa.kelas === this.filterKelas)
-        );
+    dataStatistikGabungan() {
+      const statistik = [];
+      this.filteredJurusanList.forEach(jurusan => {
+        this.filteredKelasList.forEach(kelas => {
+          statistik.push({
+            jurusan,
+            kelas,
+            hadir: this.countByStatusGabungan(jurusan, kelas, 'hadir'),
+            sakit: this.countByStatusGabungan(jurusan, kelas, 'sakit'),
+            izin: this.countByStatusGabungan(jurusan, kelas, 'izin'),
+            alfa: this.countByStatusGabungan(jurusan, kelas, 'alfa'),
+          });
+        });
       });
+      return statistik;
     },
+    filteredSiswa() {
+    return this.rekapAbsensi.filter(siswa => {
+      const jurusanMatch = this.filterJurusan === "" || siswa.jurusan === this.filterJurusan;
+      const kelasMatch = this.filterKelas === "" || siswa.kelas === this.filterKelas;
+      return jurusanMatch && kelasMatch;
+    });
   },
+
+  // Untuk grafik gabungan
+  filteredJurusanList() {
+    if (this.filterJurusan) return [this.filterJurusan];
+    return this.jurusanList;
+  },
+
+  filteredKelasList() {
+    if (this.filterKelas) return [this.filterKelas];
+    return this.kelasList;
+  },
+  },
+
   created() {
     this.fetchAllSiswa();
   },
+
+
   methods: {
     async fetchAllSiswa() {
       try {
@@ -168,24 +198,15 @@ export default {
       }
     },
 
-    countByStatus(kelas, status) {
+    countByStatusGabungan(jurusan, kelas, status) {
       return this.rekapAbsensi
-        .filter(s => s.kelas === kelas)
+        .filter(s => s.jurusan === jurusan && s.kelas === kelas)
         .reduce((total, s) => total + (s[`jumlah${this.capitalize(status)}`] || 0), 0);
     },
-
-    countByStatusGabungan(jurusan, kelas, status) {
-  return this.rekapAbsensi
-    .filter(s => s.jurusan === jurusan && s.kelas === kelas)
-    .reduce((total, s) => total + (s[`jumlah${this.capitalize(status)}`] || 0), 0);
-}
-,
 
     capitalize(word) {
       return word.charAt(0).toUpperCase() + word.slice(1);
     },
-
-
 
     async showModal(siswa) {
       this.selectedSiswa = siswa;
@@ -248,6 +269,9 @@ export default {
   },
 };
 </script>
+
+<!-- Styles tetap seperti sebelumnya -->
+
 
 <style scoped>
 .container-absen {

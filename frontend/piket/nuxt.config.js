@@ -22,6 +22,8 @@ export default {
 
   css: [
     'bootstrap/dist/css/bootstrap.min.css',
+    '@fortawesome/fontawesome-free/css/all.min.css'
+    
   ],
 
   buildModules: [

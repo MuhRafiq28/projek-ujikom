@@ -9,16 +9,51 @@
         <div class="form-content">
           <h1>Buat Izin</h1>
           <form @submit.prevent="tambahIzin">
-            <input v-model="izinBaru.nama" placeholder="Nama" required />
-            <input v-model="izinBaru.alasan" placeholder="Alasan" required />
-            <select v-model="izinBaru.status" required>
-              <option value="Keluar">Keluar</option>
-              <option value="Masuk">Masuk</option>
-              <option value="Terlambat">Terlambat</option>
-              <option value="Pulang Cepat">Pulang Lebih Cepat</option>
-            </select>
-            <button type="submit">Tambah Izin</button>
-          </form>
+  <input v-model="izinBaru.nama" placeholder="Nama" required />
+  <input v-model="izinBaru.alasan" placeholder="Alasan" required />
+
+  <select v-model="izinBaru.jurusan" required>
+    <option disabled value="">Pilih Jurusan</option>
+    <option value="RPL">RPL</option>
+    <option value="PH">PH</option>
+    <option value="MPLB">MPLB</option>
+    <option value="TO">TO</option>
+  </select>
+
+  <select v-model="izinBaru.kelas" required>
+    <option disabled value="">Pilih Kelas</option>
+    <option value="10A">10A</option>
+    <option value="10B">10B</option>
+    <option value="10C">10C</option>
+    <option value="11A">11A</option>
+    <option value="11B">11B</option>
+    <option value="11C">11C</option>
+    <option value="12A">12A</option>
+    <option value="12B">12B</option>
+    <option value="12C">12C</option>
+  </select>
+
+  <select v-model="izinBaru.status" required>
+    <option value="Keluar">Keluar</option>
+    <option value="Masuk">Masuk</option>
+    <option value="Terlambat">Terlambat</option>
+    <option value="Pulang Cepat">Pulang Lebih Cepat</option>
+  </select>
+
+  <button type="submit">Tambah Izin</button>
+</form>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Konfirmasi -->
+    <div v-if="showModal" class="modal-overlay">
+      <div class="modal-content">
+        <p>Apakah kamu yakin ingin menyimpan data izin ini?</p>
+        <div style="display: flex; justify-content: center; gap: 10px">
+          <button @click="showModal = false">Batal</button>
+          <button @click="konfirmasiTambahIzin">Ya, Simpan</button>
         </div>
       </div>
     </div>
@@ -32,32 +67,52 @@ import Navnew from "../components/Navnew.vue";
 export default {
   components: { Navnew },
   data() {
-    return {
-      izinBaru: { nama: "", alasan: "", status: "Keluar" },
-      showModal: false,
-      modalMessage: "",
-    };
-  },
-  methods: {
-    async tambahIzin() {
-      try {
-        await axios.post("http://localhost:8080/api/izin", this.izinBaru);
-
-        this.$toast.success("Absensi berhasil disimpan!", {
-          position: "top-right",
-          timeout: 3000,
-        });
-      } catch (error) {
-        this.$toast.error("Gagal menyimpan absensi", {
-          position: "top-right",
-          timeout: 3000,
-        });
-      }
-
+  return {
+    izinBaru: {
+      nama: "",
+      alasan: "",
+      jurusan: "",
+      kelas: "",
+      status: "Keluar"
     },
+    showModal: false,
+    modalMessage: "",
+  };
+},
+
+methods: {
+  tambahIzin() {
+    this.showModal = true;
   },
+  async konfirmasiTambahIzin() {
+    this.showModal = false;
+
+    try {
+      await axios.post("http://localhost:8080/api/izin", this.izinBaru);
+      this.$toast.success("Izin berhasil disimpan!", {
+        position: "top-right",
+        timeout: 3000,
+      });
+      // Reset form setelah berhasil
+      this.izinBaru = {
+        nama: "",
+        alasan: "",
+        jurusan: "",
+        kelas: "",
+        status: "Keluar"
+      };
+    } catch (error) {
+      this.$toast.error("Gagal menyimpan izin", {
+        position: "top-right",
+        timeout: 3000,
+      });
+    }
+  }
+}
+
 };
 </script>
+
 
 <style scoped>
 .container {

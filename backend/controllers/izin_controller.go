@@ -18,17 +18,27 @@ func CreateIzin(c *gin.Context) {
         return
     }
 
-    // Set waktu masuk ke sekarang jika statusnya "Masuk"
-    if izin.Status == "Masuk" {
-        now := time.Now()
-        izin.WaktuMasuk = &now  // Menggunakan pointer ke time.Now()
-    }
+    // Panggil fungsi dari models
+	izin.SetWaktuByStatus()
 
-    // Set waktu keluar jika statusnya "Keluar"
-    if izin.Status == "Keluar" {
-        now := time.Now()
-        izin.WaktuKeluar = &now // Menggunakan pointer ke time.Now()
-    }
+    // Mengambil waktu sekarang dalam zona waktu Asia/Jakarta
+jakarta, _ := time.LoadLocation("Asia/Jakarta")
+now := time.Now().In(jakarta)
+
+    
+
+switch izin.Status {
+case "Keluar", "Pulang Lebih Cepat":
+    izin.WaktuKeluar = &now
+    izin.WaktuMasuk = nil
+case "Masuk", "Terlambat":
+    izin.WaktuMasuk = &now
+    izin.WaktuKeluar = nil
+default:
+    izin.WaktuKeluar = nil
+    izin.WaktuMasuk = nil
+}
+
 
     // Simpan data ke database
     if err := database.DB.Create(&izin).Error; err != nil {
@@ -42,13 +52,12 @@ func CreateIzin(c *gin.Context) {
 // GetAllIzin - Mengambil semua data izin
 func GetAllIzin(c *gin.Context) {
     var izins []models.Izin
-
     if err := database.DB.Find(&izins).Error; err != nil {
         c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal mengambil data izin"})
         return
     }
 
-    c.JSON(http.StatusOK, gin.H{"message": "Berhasil mengambil data izin", "data": izins})
+    c.JSON(http.StatusOK, gin.H{"data": izins})
 }
 
 // DeleteIzin - Menghapus izin berdasarkan ID
@@ -74,30 +83,39 @@ func DeleteIzin(c *gin.Context) {
     c.JSON(http.StatusOK, gin.H{"message": "Izin berhasil dihapus"})
 }
 
-// KonfirmasiMasuk - Mengubah status izin menjadi "Sudah Kembali"
+
 func KonfirmasiMasuk(c *gin.Context) {
-    id := c.Param("id")
-    idInt, err := strconv.Atoi(id)
-    if err != nil {
-        c.JSON(http.StatusBadRequest, gin.H{"error": "ID tidak valid"})
-        return
-    }
+	idStr := c.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID tidak valid"})
+		return
+	}
 
-    var izin models.Izin
-    if err := database.DB.First(&izin, idInt).Error; err != nil {
-        c.JSON(http.StatusNotFound, gin.H{"error": "Izin tidak ditemukan"})
-        return
-    }
+	var izin models.Izin
+	if err := database.DB.First(&izin, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Data izin tidak ditemukan"})
+		return
+	}
 
-    // Ubah status menjadi "Sudah Kembali" dan set waktu masuk
-    izin.Status = "Sudah Kembali"
-    now := time.Now()
-    izin.WaktuMasuk = &now // Menggunakan pointer ke time.Now()
+	if izin.Status != "Keluar" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Izin belum keluar atau sudah dikonfirmasi"})
+		return
+	}
 
-    if err := database.DB.Save(&izin).Error; err != nil {
-        c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal mengupdate izin"})
-        return
-    }
+	loc, _ := time.LoadLocation("Asia/Jakarta")
+now := time.Now().In(loc)
 
-    c.JSON(http.StatusOK, gin.H{"message": "Izin dikonfirmasi masuk", "data": izin})
+izin.Status = "Sudah Kembali"
+izin.WaktuMasuk = &now
+
+	if err := database.DB.Save(&izin).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal menyimpan perubahan"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Siswa berhasil dikonfirmasi masuk",
+		"data":    izin,
+	})
 }

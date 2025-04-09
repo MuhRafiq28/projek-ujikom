@@ -117,3 +117,4 @@ func DeleteSchedule(c *gin.Context) {
 	// Kirim respons
 	c.Status(http.StatusNoContent)
 }
+

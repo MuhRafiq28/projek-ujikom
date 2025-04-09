@@ -1,15 +1,17 @@
 package models
 
 import (
-    "gorm.io/gorm"  // Pastikan Anda mengimpor GORM
+    
 	"time"
 )
 
 type User struct {
-	ID       uint   `gorm:"primaryKey"`
-	Username string `gorm:"unique" json:"username"`
-	Password string `gorm:"not null" json:"password"` 
-	Role     string `gorm:"default:user" json:"role"`
+	ID       uint   `json:"id" gorm:"primaryKey"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Role     string `json:"role"`
+	Jurusan  string `json:"jurusan"` // Menambahkan field jurusan
+	Kelas    string `json:"kelas"`   // Menambahkan field kelas
 }
 
 type Schedule struct {
@@ -27,14 +29,20 @@ type Guru struct {
 	MapelGuru string `json:"mapelguru"`
 }
 
+// Struct untuk response
+
+
 type Izin struct {
-	gorm.Model
-	Nama       string    `json:"nama" binding:"required"`
-	Status     string    `json:"status" binding:"required"`
-	Alasan     string    `json:"alasan" binding:"required"`
-	WaktuMasuk   *time.Time `json:"waktu_masuk"` // pointer to time.Time
-    WaktuKeluar  *time.Time `json:"waktu_keluar"`
+	ID          uint       `json:"id" gorm:"primaryKey"`
+	Nama        string     `json:"nama"`
+	Status      string     `json:"status"`
+	Alasan      string     `json:"alasan"`
+	Jurusan     string     `json:"jurusan"`
+	Kelas       string     `json:"kelas"`
+	WaktuMasuk  *time.Time `json:"waktu_masuk"`
+	WaktuKeluar *time.Time `json:"waktu_keluar"`
 }
+
 
 
 type Siswa struct {
@@ -57,3 +65,22 @@ type Absensi struct {
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
+
+
+type Jadwal struct {
+    ID              uint           `json:"id"`
+    Jurusan         string         `json:"jurusan"`
+    Kelas           string         `json:"kelas"`
+    Hari            string         `json:"hari"`
+    JamMulai        string         `json:"jam_mulai"`
+    JamSelesai      string         `json:"jam_selesai"`
+    MataPelajaran   MataPelajaran  `json:"mata_pelajaran" gorm:"foreignKey:MataPelajaranID;references:ID"`
+    MataPelajaranID uint           `json:"mata_pelajaran_id"`
+    Guru            string         `json:"guru"`
+}
+
+type MataPelajaran struct {
+    ID   uint   `json:"id"`
+    Nama string `json:"nama"`
+}
+

@@ -66,9 +66,26 @@
         </tbody>
       </table>
 
-      <button @click="submitAbsensi" class="btn-submit">Simpan Absensi</button>
+      <!-- Tombol Simpan Absensi -->
+<button @click="showModal = true" class="btn-submit">Simpan Absensi</button>
+
+
+
+    </div>
+    <!-- Modal Konfirmasi -->
+<div v-if="showModal" class="modal-overlay">
+  <div class="modal-box">
+    <h3>Konfirmasi Simpan Absensi</h3>
+    <p>Apakah kamu yakin ingin menyimpan absensi ini?</p>
+    <div class="modal-actions">
+      <button class="btn-cancel" @click="showModal = false">Batal</button>
+      <button class="btn-confirm" @click="confirmSubmit">Ya, Simpan</button>
     </div>
   </div>
+</div>
+
+  </div>
+
 </template>
 
 <script>
@@ -96,6 +113,8 @@ export default {
       jurusanList: ["RPL", "MPLB", "PH", "TO"],
       selectedKelas: "",
       selectedJurusan: "",
+      showModal: false,
+
     };
   },
   computed: {
@@ -168,6 +187,11 @@ export default {
         });
       }
     },
+    async confirmSubmit() {
+  this.showModal = false;
+  await this.submitAbsensi();
+},
+
   },
   mounted() {
     this.fetchSiswa();
@@ -273,4 +297,53 @@ export default {
 .btn-submit:hover {
   background-color: #218838;
 }
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.modal-box {
+  background: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.modal-actions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.btn-cancel,
+.btn-confirm {
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn-cancel {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn-confirm {
+  background-color: #28a745;
+  color: white;
+}
+
 </style>

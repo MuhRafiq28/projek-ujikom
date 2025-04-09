@@ -39,7 +39,7 @@ func ConnectDatabase() {
 	}
 
 	// Migrasi model ke database
-	err = db.AutoMigrate(&models.User{}, &models.Schedule{}, &models.Guru{},&models.Izin{},&models.Siswa{},&models.Absensi{})
+	err = db.AutoMigrate(&models.User{}, &models.Schedule{}, &models.Guru{},&models.Izin{},&models.Siswa{},&models.Absensi{},&models.MataPelajaran{}, &models.Jadwal{})
 	
 
 	if err != nil {

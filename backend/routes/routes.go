@@ -2,7 +2,7 @@ package routes
 
 import (
 	"backend/controllers"
-
+	"backend/middleware"
 	"github.com/gin-gonic/gin"
 )
 
@@ -31,6 +31,7 @@ func RegisterRoutes(r *gin.Engine) {
 		api.POST("/izin", controllers.CreateIzin)        // Menambahkan izin
 		api.GET("/izin", controllers.GetAllIzin)          // Mendapatkan semua izin
 		api.DELETE("/izin/:id", controllers.DeleteIzin)   // Menghapus izin berdasarkan ID
+		
 		api.PUT("/izin/:id/konfirmasi", controllers.KonfirmasiMasuk) // Konfirmasi izin
 
 		// Routes untuk siswa
@@ -41,6 +42,8 @@ func RegisterRoutes(r *gin.Engine) {
 		api.DELETE("/siswa/:id", controllers.DeleteSiswa)
 		
 
+		
+
 
 
 		// Routes untuk absensi & RekapAbsensi
@@ -48,8 +51,12 @@ func RegisterRoutes(r *gin.Engine) {
 		api.GET("/rekap-absensi/nama/:nama", controllers.GetRekapAbsensiByNama)
 		api.DELETE("/rekap-absensi/:id", controllers.DeleteAbsensiByID)   
 		api.DELETE("/absensi/all", controllers.DeleteAllAbsensi)
+		api.GET("/user/:id", controllers.GetUserData)
 
 		
+		api.GET("/jadwal", middleware.AuthMiddleware(), controllers.GetJadwal)
+
+
 		
 
 	

@@ -68,6 +68,17 @@
             </tr>
           </tbody>
         </table>
+        <!-- Rekap Jumlah Siswa per Kelas -->
+<div class="rekap-jumlah">
+  <h4>Jumlah Siswa per Kelas</h4>
+  <ul>
+    <li v-for="(jumlah, key) in jumlahPerKelas" :key="key">
+      {{ key }}: {{ jumlah }}
+    </li>
+  </ul>
+  <p><strong>Total keseluruhan siswa:</strong> {{ siswaList.length }}</p>
+</div>
+
       </div>
 
       <!-- Modal Tambah/Edit -->
@@ -169,6 +180,22 @@ export default {
       }
     }
 
+    const jumlahPerKelas = computed(() => {
+  const count = {}
+  siswaList.value.forEach((siswa) => {
+    const key = `${siswa.jurusan} ${siswa.kelas}`
+    count[key] = (count[key] || 0) + 1
+  })
+
+  const ordered = {}
+  urutanKelas.forEach((kelas) => {
+    ordered[kelas] = count[kelas] || 0
+  })
+  return ordered
+})
+
+
+
     const submitForm = async () => {
       try {
         if (isEditing.value) {
@@ -200,6 +227,24 @@ export default {
       fetchSiswa()
     }
 
+
+
+    const urutanKelas = [
+  'RPL 10A', 'RPL 10B', 'RPL 10C',
+  'RPL 11A', 'RPL 11B', 'RPL 11C',
+  'RPL 12A', 'RPL 12B', 'RPL 12C',
+  'PH 10A', 'PH 10B', 'PH 10C',
+  'PH 11A', 'PH 11B', 'PH 11C',
+  'PH 12A', 'PH 12B', 'PH 12C',
+  'MPLB 10A', 'MPLB 10B', 'MPLB 10C',
+  'MPLB 11A', 'MPLB 11B', 'MPLB 11C',
+  'MPLB 12A', 'MPLB 12B', 'MPLB 12C',
+  'TO 10A', 'TO 10B', 'TO 10C',
+  'TO 11A', 'TO 11B', 'TO 11C',
+  'TO 12A', 'TO 12B', 'TO 12C'
+]
+
+
     onMounted(fetchSiswa)
 
     return {
@@ -220,8 +265,15 @@ export default {
       deleteSiswa,
       submitForm,
       closeForm,
-      resetFilter
+      resetFilter,
+
+  siswaList,
+  jumlahPerKelas,
+
+
     }
+
+
   }
 }
 </script>
@@ -384,6 +436,12 @@ table {
   margin-top: 20px;
 }
 
+.table-container {
+  display: flex;
+
+  gap:10px
+}
+
 table thead {
   background: linear-gradient(135deg, #9099A2, #96858F);
   color: white;
@@ -445,6 +503,22 @@ button:hover {
 .filter-group input[type="text"]:focus {
   border-color: #007bff;
   outline: none;
+}
+
+.rekap-jumlah {
+  margin-top: 20px;
+  background: #f0f0f0;
+  padding: 16px;
+  border-radius: 8px;
+  max-width: 300px;
+}
+.rekap-jumlah h4 {
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+.rekap-jumlah li {
+  margin-bottom: 6px;
+  font-size: 14px;
 }
 
 /* (Style lainnya tidak berubah, tetap seperti sebelumnya) */
