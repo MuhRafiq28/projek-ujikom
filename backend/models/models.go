@@ -41,6 +41,7 @@ type Izin struct {
 	Kelas       string     `json:"kelas"`
 	WaktuMasuk  *time.Time `json:"waktu_masuk"`
 	WaktuKeluar *time.Time `json:"waktu_keluar"`
+	
 }
 
 

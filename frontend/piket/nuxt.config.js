@@ -32,7 +32,9 @@ export default {
 
   plugins: [
     { src: "~/plugins/toast.js", mode: "client" },
+    { src: "~/plugins/sweetalert2.js", mode: "client" }
   ],
+  
 
 
 

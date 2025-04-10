@@ -9,40 +9,39 @@
         <div class="form-content">
           <h1>Buat Izin</h1>
           <form @submit.prevent="tambahIzin">
-  <input v-model="izinBaru.nama" placeholder="Nama" required />
-  <input v-model="izinBaru.alasan" placeholder="Alasan" required />
+            <input v-model="izinBaru.nama" placeholder="Nama" required />
+            <input v-model="izinBaru.alasan" placeholder="Alasan" required />
 
-  <select v-model="izinBaru.jurusan" required>
-    <option disabled value="">Pilih Jurusan</option>
-    <option value="RPL">RPL</option>
-    <option value="PH">PH</option>
-    <option value="MPLB">MPLB</option>
-    <option value="TO">TO</option>
-  </select>
+            <select v-model="izinBaru.jurusan" required>
+              <option disabled value="">Pilih Jurusan</option>
+              <option value="RPL">RPL</option>
+              <option value="PH">PH</option>
+              <option value="MPLB">MPLB</option>
+              <option value="TO">TO</option>
+            </select>
 
-  <select v-model="izinBaru.kelas" required>
-    <option disabled value="">Pilih Kelas</option>
-    <option value="10A">10A</option>
-    <option value="10B">10B</option>
-    <option value="10C">10C</option>
-    <option value="11A">11A</option>
-    <option value="11B">11B</option>
-    <option value="11C">11C</option>
-    <option value="12A">12A</option>
-    <option value="12B">12B</option>
-    <option value="12C">12C</option>
-  </select>
+            <select v-model="izinBaru.kelas" required>
+              <option disabled value="">Pilih Kelas</option>
+              <option value="10A">10A</option>
+              <option value="10B">10B</option>
+              <option value="10C">10C</option>
+              <option value="11A">11A</option>
+              <option value="11B">11B</option>
+              <option value="11C">11C</option>
+              <option value="12A">12A</option>
+              <option value="12B">12B</option>
+              <option value="12C">12C</option>
+            </select>
 
-  <select v-model="izinBaru.status" required>
-    <option value="Keluar">Keluar</option>
-    <option value="Masuk">Masuk</option>
-    <option value="Terlambat">Terlambat</option>
-    <option value="Pulang Cepat">Pulang Lebih Cepat</option>
-  </select>
+            <select v-model="izinBaru.status" required>
+              <option value="Keluar">Keluar</option>
+              <option value="Masuk">Masuk</option>
+              <option value="Terlambat">Terlambat</option>
+              <option value="Pulang Cepat">Pulang Lebih Cepat</option>
+            </select>
 
-  <button type="submit">Tambah Izin</button>
-</form>
-
+            <button type="submit">Tambah Izin</button>
+          </form>
         </div>
       </div>
     </div>
@@ -67,57 +66,80 @@ import Navnew from "../components/Navnew.vue";
 export default {
   components: { Navnew },
   data() {
-  return {
-    izinBaru: {
-      nama: "",
-      alasan: "",
-      jurusan: "",
-      kelas: "",
-      status: "Keluar"
-    },
-    showModal: false,
-    modalMessage: "",
-  };
-},
-
-methods: {
-  tambahIzin() {
-    this.showModal = true;
-  },
-  async konfirmasiTambahIzin() {
-    this.showModal = false;
-
-    try {
-      await axios.post("http://localhost:8080/api/izin", this.izinBaru);
-      this.$toast.success("Izin berhasil disimpan!", {
-        position: "top-right",
-        timeout: 3000,
-      });
-      // Reset form setelah berhasil
-      this.izinBaru = {
+    return {
+      izinBaru: {
         nama: "",
         alasan: "",
         jurusan: "",
         kelas: "",
-        status: "Keluar"
+        status: "Keluar",
+        waktu_keluar: ""  // Menambahkan field waktu_keluar
+      },
+      showModal: false,
+      modalMessage: "",
+    };
+  },
+
+  methods: {
+    tambahIzin() {
+      // Menambahkan waktu_keluar saat status 'Pulang Lebih Cepat'
+      if (this.izinBaru.status === "Pulang Lebih Cepat") {
+        this.izinBaru.waktu_keluar = new Date().toISOString(); // Menyimpan waktu saat izin dibuat
+      }
+
+      // Menampilkan modal konfirmasi
+      this.showModal = true;
+    },
+
+    async konfirmasiTambahIzin() {
+      this.showModal = false;
+
+      // Menyiapkan data yang akan dikirim sesuai format
+      const izinData = {
+        nama: this.izinBaru.nama,
+        alasan: this.izinBaru.alasan,
+        jurusan: this.izinBaru.jurusan,
+        kelas: this.izinBaru.kelas,
+        status: this.izinBaru.status === "Pulang Cepat" ? "Pulang Lebih Cepat" : this.izinBaru.status, // Mengubah status menjadi 'Pulang Lebih Cepat' jika 'Pulang Cepat'
+        // hanya menambahkan waktu_keluar jika statusnya "Pulang Lebih Cepat"
+        ...(this.izinBaru.status === "Pulang Lebih Cepat" && { waktu_keluar: this.izinBaru.waktu_keluar })
       };
-    } catch (error) {
-      this.$toast.error("Gagal menyimpan izin", {
-        position: "top-right",
-        timeout: 3000,
-      });
+
+      try {
+        // Kirim data izin ke backend
+        const response = await axios.post("http://localhost:8080/api/izin", izinData);
+
+        if (response.data.message === "Izin berhasil ditambahkan") {
+          this.$toast.success("Izin berhasil disimpan!", {
+            position: "top-right",
+            timeout: 3000,
+          });
+
+          // Reset form setelah berhasil
+          this.izinBaru = {
+            nama: "",
+            alasan: "",
+            jurusan: "",
+            kelas: "",
+            status: "Keluar",
+            waktu_keluar: ""
+          };
+        }
+      } catch (error) {
+        this.$toast.error("Gagal menyimpan izin", {
+          position: "top-right",
+          timeout: 3000,
+        });
+      }
     }
   }
-}
-
 };
 </script>
-
 
 <style scoped>
 .container {
   max-width: 900px;
-  margin: 170px auto 80px; /* Memberi jarak lebih dari navbar */
+  margin: 90px auto 80px; /* Memberi jarak lebih dari navbar */
   padding: 20px;
   background: #fff;
   border-radius: 10px;

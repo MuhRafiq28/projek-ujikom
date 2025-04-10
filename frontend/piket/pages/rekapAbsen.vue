@@ -3,7 +3,7 @@
     <div>
       <Navnew />
       <div class="container">
-        <h1 style="margin-left: 380px;">Absen Siswa</h1>
+        <h1 style="margin-left: 380px">Absen Siswa</h1>
 
         <!-- Filter -->
         <div class="filter-wrapper">
@@ -11,7 +11,9 @@
             <label for="jurusan">Pilih Jurusan:</label>
             <select v-model="filterJurusan" id="jurusan" class="form-control">
               <option value="">Semua Jurusan</option>
-              <option v-for="j in jurusanList" :key="j" :value="j">{{ j }}</option>
+              <option v-for="j in jurusanList" :key="j" :value="j">
+                {{ j }}
+              </option>
             </select>
           </div>
 
@@ -19,13 +21,30 @@
             <label for="kelas">Pilih Kelas:</label>
             <select v-model="filterKelas" id="kelas" class="form-control">
               <option value="">Semua Kelas</option>
-              <option v-for="k in kelasList" :key="k" :value="k">{{ k }}</option>
+              <option v-for="k in kelasList" :key="k" :value="k">
+                {{ k }}
+              </option>
             </select>
           </div>
 
           <div class="filter-container">
+            <label for="kelas">Cari Nama Siswa:</label>
+            
+              <input
+                type="text"
+                v-model="filterNama"
+                placeholder="Cari nama siswa..."
+                class="input"
+                style="border-radius: 5px;"
+              />
+            
+          </div>
+
+          <div class="filter-container">
             <label>&nbsp;</label>
-            <button class="btn-reset" @click="resetFilter"><i class="fas fa-sync-alt"></i></button>
+            <button class="btn-reset" @click="resetFilter">
+              <i class="fas fa-sync-alt"></i>
+            </button>
           </div>
         </div>
 
@@ -51,7 +70,12 @@
             <tr v-for="(siswa, index) in filteredSiswa" :key="siswa.id">
               <td>{{ index + 1 }}</td>
               <td>{{ siswa.nis }}</td>
-              <td @click="showModal(siswa)" class="text-primary cursor-pointer nama-siswa">{{ siswa.nama }}</td>
+              <td
+                @click="showModal(siswa)"
+                class="text-primary cursor-pointer nama-siswa"
+              >
+                {{ siswa.nama }}
+              </td>
               <td>{{ siswa.jurusan }}</td>
               <td>{{ siswa.kelas }}</td>
               <td>{{ siswa.jumlahHadir }}</td>
@@ -64,8 +88,16 @@
 
         <!-- Aksi -->
         <div class="d-flex justify-center">
-          <button class="button-download mr-1" @click="generatePDF">Download PDF</button>
-          <button class="button-hapus" @click="hapusSemuaAbsensi" :disabled="loading">Hapus Semua Absensi</button>
+          <button class="button-download mr-1" @click="generatePDF">
+            Download PDF
+          </button>
+          <button
+            class="button-hapus"
+            @click="hapusSemuaAbsensi"
+            :disabled="loading"
+          >
+            Hapus Semua Absensi
+          </button>
         </div>
 
         <!-- Modal -->
@@ -81,22 +113,18 @@
     <!-- Menu Grafik Gabungan Jurusan & Kelas -->
     <div class="menu-gerafik">
       <!-- Sidebar statistik -->
-<div class="w-full lg:w-1/4 p-4 bg-gray-100 rounded-xl shadow-md">
-  <i class="fas fa-chart-bar mr-2"></i>
-  <span>Statistik Kehadiran</span>
-  <div class="space-y-6 max-h-[600px] overflow-y-auto">
-    <div v-for="(data, index) in dataStatistikGabungan" :key="index">
-      <p class="font-semibold text-gray-700 mb-1">{{ data.label }}</p>
-      <GrafikStatistik :dataStatistik="[data]" />
+      <div class="w-full lg:w-1/4 p-4 bg-gray-100 rounded-xl shadow-md">
+        <i class="fas fa-chart-bar mr-2"></i>
+        <span>Statistik Kehadiran</span>
+        <div class="space-y-6 max-h-[600px] overflow-y-auto">
+          <div v-for="(data, index) in dataStatistikGabungan" :key="index">
+            <p class="font-semibold text-gray-700 mb-1">{{ data.label }}</p>
+            <GrafikStatistik :dataStatistik="[data]" />
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-</div>
-
-
-</div>
-
-      </div>
-
 </template>
 
 <script>
@@ -121,54 +149,68 @@ export default {
       absensiSiswa: [],
       filterJurusan: "",
       filterKelas: "",
+      filterNama: "",
       jurusanList: ["RPL", "MPLB", "PH"],
-      kelasList: ["10A", "10B", "10C", "11A", "11B", "11C", "12A", "12B", "12C"],
+      kelasList: [
+        "10A",
+        "10B",
+        "10C",
+        "11A",
+        "11B",
+        "11C",
+        "12A",
+        "12B",
+        "12C",
+      ],
       loading: false,
     };
   },
 
-
   computed: {
     dataStatistikGabungan() {
       const statistik = [];
-      this.filteredJurusanList.forEach(jurusan => {
-        this.filteredKelasList.forEach(kelas => {
+      this.filteredJurusanList.forEach((jurusan) => {
+        this.filteredKelasList.forEach((kelas) => {
           statistik.push({
             jurusan,
             kelas,
-            hadir: this.countByStatusGabungan(jurusan, kelas, 'hadir'),
-            sakit: this.countByStatusGabungan(jurusan, kelas, 'sakit'),
-            izin: this.countByStatusGabungan(jurusan, kelas, 'izin'),
-            alfa: this.countByStatusGabungan(jurusan, kelas, 'alfa'),
+            hadir: this.countByStatusGabungan(jurusan, kelas, "hadir"),
+            sakit: this.countByStatusGabungan(jurusan, kelas, "sakit"),
+            izin: this.countByStatusGabungan(jurusan, kelas, "izin"),
+            alfa: this.countByStatusGabungan(jurusan, kelas, "alfa"),
           });
         });
       });
       return statistik;
     },
     filteredSiswa() {
-    return this.rekapAbsensi.filter(siswa => {
-      const jurusanMatch = this.filterJurusan === "" || siswa.jurusan === this.filterJurusan;
-      const kelasMatch = this.filterKelas === "" || siswa.kelas === this.filterKelas;
-      return jurusanMatch && kelasMatch;
-    });
-  },
+      return this.rekapAbsensi.filter((siswa) => {
+        const jurusanMatch =
+          this.filterJurusan === "" || siswa.jurusan === this.filterJurusan;
+        const kelasMatch =
+          this.filterKelas === "" || siswa.kelas === this.filterKelas;
+        const namaMatch =
+          this.filterNama === "" ||
+          siswa.nama.toLowerCase().includes(this.filterNama.toLowerCase());
+        return jurusanMatch && kelasMatch && namaMatch;
+      });
+    },
 
-  // Untuk grafik gabungan
-  filteredJurusanList() {
-    if (this.filterJurusan) return [this.filterJurusan];
-    return this.jurusanList;
-  },
+    // Untuk grafik gabungan
+    filteredJurusanList() {
+      if (this.filterJurusan) return [this.filterJurusan];
+      return this.jurusanList;
+    },
 
-  filteredKelasList() {
-    if (this.filterKelas) return [this.filterKelas];
-    return this.kelasList;
-  },
+    filteredKelasList() {
+      if (this.filterKelas) return [this.filterKelas];
+      return this.kelasList;
+    },
   },
 
   created() {
     this.fetchAllSiswa();
   },
-
 
   methods: {
     async fetchAllSiswa() {
@@ -179,14 +221,30 @@ export default {
         await Promise.all(
           siswaData.map(async (siswa) => {
             try {
-              const res = await axios.get(`http://localhost:8080/api/rekap-absensi/nama/${encodeURIComponent(siswa.nama)}`);
+              const res = await axios.get(
+                `http://localhost:8080/api/rekap-absensi/nama/${encodeURIComponent(
+                  siswa.nama
+                )}`
+              );
               const absensi = res.data?.data || [];
-              siswa.jumlahHadir = absensi.filter(a => a.status.toLowerCase() === "hadir").length;
-              siswa.jumlahSakit = absensi.filter(a => a.status.toLowerCase() === "sakit").length;
-              siswa.jumlahIzin = absensi.filter(a => a.status.toLowerCase() === "izin").length;
-              siswa.jumlahAlfa = absensi.filter(a => a.status.toLowerCase() === "alfa").length;
+              siswa.jumlahHadir = absensi.filter(
+                (a) => a.status.toLowerCase() === "hadir"
+              ).length;
+              siswa.jumlahSakit = absensi.filter(
+                (a) => a.status.toLowerCase() === "sakit"
+              ).length;
+              siswa.jumlahIzin = absensi.filter(
+                (a) => a.status.toLowerCase() === "izin"
+              ).length;
+              siswa.jumlahAlfa = absensi.filter(
+                (a) => a.status.toLowerCase() === "alfa"
+              ).length;
             } catch {
-              siswa.jumlahHadir = siswa.jumlahSakit = siswa.jumlahIzin = siswa.jumlahAlfa = 0;
+              siswa.jumlahHadir =
+                siswa.jumlahSakit =
+                siswa.jumlahIzin =
+                siswa.jumlahAlfa =
+                  0;
             }
           })
         );
@@ -200,8 +258,11 @@ export default {
 
     countByStatusGabungan(jurusan, kelas, status) {
       return this.rekapAbsensi
-        .filter(s => s.jurusan === jurusan && s.kelas === kelas)
-        .reduce((total, s) => total + (s[`jumlah${this.capitalize(status)}`] || 0), 0);
+        .filter((s) => s.jurusan === jurusan && s.kelas === kelas)
+        .reduce(
+          (total, s) => total + (s[`jumlah${this.capitalize(status)}`] || 0),
+          0
+        );
     },
 
     capitalize(word) {
@@ -212,7 +273,11 @@ export default {
       this.selectedSiswa = siswa;
       this.showModalFlag = true;
       try {
-        const response = await axios.get(`http://localhost:8080/api/rekap-absensi/nama/${encodeURIComponent(siswa.nama)}`);
+        const response = await axios.get(
+          `http://localhost:8080/api/rekap-absensi/nama/${encodeURIComponent(
+            siswa.nama
+          )}`
+        );
         this.absensiSiswa = response.data?.data || [];
       } catch (error) {
         console.error("Gagal ambil absensi:", error);
@@ -224,10 +289,16 @@ export default {
       this.loading = true;
       try {
         await axios.delete("http://localhost:8080/api/absensi/all");
-        this.$toast.success("Rekap absensi berhasil dihapus!", { position: "top-right", timeout: 3000 });
+        this.$toast.success("Rekap absensi berhasil dihapus!", {
+          position: "top-right",
+          timeout: 3000,
+        });
         await this.fetchAllSiswa();
       } catch (error) {
-        this.$toast.error("Gagal menghapus absensi", { position: "top-right", timeout: 3000 });
+        this.$toast.error("Gagal menghapus absensi", {
+          position: "top-right",
+          timeout: 3000,
+        });
       } finally {
         this.loading = false;
       }
@@ -238,7 +309,19 @@ export default {
       doc.setFontSize(18);
       doc.text("Rekap Absensi Siswa", 14, 15);
 
-      const headers = [["No", "NIS", "Nama", "Jurusan", "Kelas", "Hadir", "Sakit", "Izin", "Alfa"]];
+      const headers = [
+        [
+          "No",
+          "NIS",
+          "Nama",
+          "Jurusan",
+          "Kelas",
+          "Hadir",
+          "Sakit",
+          "Izin",
+          "Alfa",
+        ],
+      ];
       const data = this.filteredSiswa.map((siswa, index) => [
         index + 1,
         siswa.nis,
@@ -271,7 +354,6 @@ export default {
 </script>
 
 <!-- Styles tetap seperti sebelumnya -->
-
 
 <style scoped>
 .container-absen {
@@ -374,7 +456,7 @@ export default {
 }
 
 .table thead {
-  background: linear-gradient(135deg, #9099A2, #96858F);
+  background: linear-gradient(135deg, #9099a2, #96858f);
   color: white;
   font-weight: bold;
 }

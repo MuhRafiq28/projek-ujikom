@@ -15,7 +15,6 @@
         </div>
       </div>
       <div class="aksi-btn d-flex justify-content-center gap-3 mt-3">
-  <button class="btn btn-primary" v-if="absensi.length" @click="downloadPDF">Download PDF</button>
   <button class="btn btn-secondary" @click="$emit('close')">Tutup</button>
 </div>
 
@@ -25,7 +24,6 @@
 
 <script>
 import axios from "axios";
-import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 
 export default {
@@ -97,33 +95,7 @@ export default {
         default: return '';
       }
     },
-    async downloadPDF() {
-      const modalContent = document.getElementById("rekap-absensi");
 
-      if (!modalContent) {
-        console.error("Elemen modal tidak ditemukan!");
-        return;
-      }
-
-      try {
-        const canvas = await html2canvas(modalContent, {
-          scale: 2,
-          logging: false,
-          useCORS: true,
-        });
-
-        const imgData = canvas.toDataURL("image/png");
-        const pdf = new jsPDF("p", "mm", "a4");
-
-        const imgWidth = 190;
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
-        pdf.addImage(imgData, "PNG", 10, 10, imgWidth, imgHeight);
-
-        pdf.save(`Rekap_Absensi_${this.siswa.nama}.pdf`);
-      } catch (error) {
-        console.error("Gagal membuat PDF:", error);
-      }
-    }
   }
 };
 </script>
