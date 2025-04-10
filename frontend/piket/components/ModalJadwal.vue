@@ -40,6 +40,8 @@
 </template>
 
 <script>
+import Swal from 'sweetalert2'
+
 export default {
   props: {
     isVisible: Boolean,
@@ -57,8 +59,37 @@ export default {
     }
   },
   methods: {
-    submit() {
-      this.$emit("submit", this.localSchedule);
+    async submit() {
+      try {
+        // Emit event submit ke parent component
+        this.$emit("submit", this.localSchedule);
+
+        // Tampilkan notifikasi sukses
+        await Swal.fire({
+          title: 'Sukses!',
+          text: this.editMode ? 'Jadwal berhasil diperbarui!' : 'Jadwal berhasil ditambahkan!',
+          icon: 'success',
+          confirmButtonText: 'OK',
+          confirmButtonColor: '#6c63ff',
+          timer: 3000,
+          timerProgressBar: true,
+          toast: true,
+          position: 'top-end',
+          showConfirmButton: false
+        });
+
+        // Tutup modal setelah notifikasi
+        this.$emit('close');
+      } catch (error) {
+        // Tampilkan notifikasi error jika ada masalah
+        Swal.fire({
+          title: 'Error!',
+          text: 'Terjadi kesalahan saat menyimpan data',
+          icon: 'error',
+          confirmButtonText: 'OK',
+          confirmButtonColor: '#ff6b6b'
+        });
+      }
     }
   }
 };

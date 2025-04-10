@@ -35,7 +35,7 @@
       </div>
 
       <!-- Tambah Siswa Button -->
-      <button @click="isModalVisible = true" class="btn-add-bulk">Tambah Banyak Siswa</button>
+      <button @click="isModalVisible = true" class="btn-add-bulk">Tambah Siswa</button>
       <TambahBanyakSiswaModal :isVisible="isModalVisible" @close="isModalVisible = false" @refreshData="fetchSiswa" />
 
       <!-- Tabel -->
@@ -44,7 +44,7 @@
           <table>
             <thead>
               <tr>
-                <th>#</th>
+                <th>No</th>
                 <th>Nama</th>
                 <th>NIS</th>
                 <th>Jurusan</th>
@@ -177,7 +177,7 @@ export default {
     const formTitle = computed(() => isEditing.value ? 'Edit Siswa' : 'Tambah Siswa')
 
     const hasChanges = (original, edited) => {
-      return Object.keys(edited).some(key => 
+      return Object.keys(edited).some(key =>
         key !== 'id' && original[key] !== edited[key]
       )
     }
@@ -260,7 +260,7 @@ export default {
         if (isEditing.value) {
           // Cari siswa asli untuk dibandingkan
           const originalSiswa = siswaList.value.find(s => s.id === formData.value.id)
-          
+
           // Periksa apakah ada perubahan
           if (!hasChanges(originalSiswa, formData.value)) {
             await Swal.fire({
@@ -271,7 +271,7 @@ export default {
             })
             return
           }
-          
+
           await axios.put(`http://localhost:8080/api/siswa/${formData.value.id}`, formData.value)
           await Swal.fire({
             icon: 'success',
@@ -297,7 +297,7 @@ export default {
         await Swal.fire({
           icon: 'error',
           title: 'Gagal',
-          text: isEditing.value 
+          text: isEditing.value
             ? `Gagal memperbarui data siswa ${formData.value.nama}`
             : 'Gagal menambahkan siswa baru',
           confirmButtonColor: '#d33',

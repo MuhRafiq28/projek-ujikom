@@ -137,73 +137,97 @@ export default {
 </script>
 
 <style scoped>
+/* === Global Styles === */
 .container {
-  max-width: 900px;
-  margin: 90px auto 80px; /* Memberi jarak lebih dari navbar */
-  padding: 20px;
-  background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  display: flex;
-  align-items: center;
-  gap: 20px;
+  max-width: 800px;
+  margin: 90px auto 40px;
+  padding: 0;
 }
 
+/* === Form Layout === */
 .form-container {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
   align-items: center;
-  width: 100%;
-  gap: 30px;
 }
 
 .image-container img {
-  width: 300px;
-  border-radius: 10px;
+  width: 100%;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .form-content {
-  flex: 1;
+  padding: 30px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+h1 {
+  font-size: 1.8rem;
+  color: #2c3e50;
+  margin-bottom: 24px;
+  font-weight: 600;
   text-align: center;
 }
 
-/* Input dan select dengan efek hover */
+/* === Form Elements === */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 input, select {
   width: 100%;
-  padding: 10px;
-  margin: 10px 0;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  font-size: 16px;
-  transition: all 0.3s ease-in-out;
+  padding: 12px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  background: #f8fafc;
+  transition: all 0.2s ease;
 }
 
 input:focus, select:focus {
-  border-color: #8e44ad;
-  box-shadow: 0 0 8px rgba(142, 68, 173, 0.5);
-  transform: scale(1.05);
+  outline: none;
+  border-color: #6366f1;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
-/* Animasi hover pada tombol */
+/* Custom Select Styling */
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364758b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+  padding-right: 36px;
+}
+
+/* Button Styling */
 button {
-  width: 100%;
-  padding: 12px;
-  border-radius: 5px;
-  border: none;
-  font-size: 16px;
+  padding: 14px;
+  background: #6366f1;
   color: white;
-  background: linear-gradient(135deg, #3498db, #8e44ad);
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  transition: all 0.2s ease;
+  margin-top: 8px;
 }
 
 button:hover {
-  transform: scale(1.1);
-  box-shadow: 0 8px 15px rgba(142, 68, 173, 0.3);
+  background: #4f46e5;
+  transform: translateY(-1px);
 }
 
 button:active {
-  transform: scale(1);
-  box-shadow: 0 4px 8px rgba(142, 68, 173, 0.2);
+  transform: translateY(0);
 }
 
 /* Modal Styling */
@@ -211,43 +235,80 @@ button:active {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  right: 0;
+  bottom: 0;
   background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 1000;
 }
 
 .modal-content {
   background: white;
-  padding: 15px 25px;
-  border-radius: 8px;
-  text-align: center;
-  width: 300px;
-  animation: fadeIn 0.2s ease-in-out;
+  padding: 24px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  animation: modalFadeIn 0.2s ease-out;
 }
 
 .modal-content p {
-  font-size: 16px;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
+  color: #334155;
+  text-align: center;
+}
+
+.modal-content div {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
 }
 
 .modal-content button {
-  background-color: #3498db;
-  color: white;
-  padding: 8px 16px;
-  border-radius: 5px;
-  border: none;
-  cursor: pointer;
+  flex: 1;
+  margin: 0;
+  padding: 10px;
 }
 
-.modal-content button:hover {
-  background-color: #8e44ad;
+.modal-content button:first-child {
+  background: #f1f5f9;
+  color: #64748b;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.9); }
-  to { opacity: 1; transform: scale(1); }
+.modal-content button:first-child:hover {
+  background: #e2e8f0;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* === Responsive Design === */
+@media (max-width: 768px) {
+  .form-container {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .image-container {
+    display: none;
+  }
+
+  .form-content {
+    padding: 24px;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
 }
 </style>

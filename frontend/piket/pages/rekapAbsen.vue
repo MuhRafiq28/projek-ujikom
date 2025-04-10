@@ -3,7 +3,7 @@
     <div>
       <Navnew />
       <div class="container">
-        <h1 style="margin-left: 380px">Absen Siswa</h1>
+        <h1 >Absen Siswa</h1>
 
         <!-- Filter -->
         <div class="filter-wrapper">
@@ -29,7 +29,7 @@
 
           <div class="filter-container">
             <label for="kelas">Cari Nama Siswa:</label>
-            
+
               <input
                 type="text"
                 v-model="filterNama"
@@ -37,7 +37,7 @@
                 class="input"
                 style="border-radius: 5px;"
               />
-            
+
           </div>
 
           <div class="filter-container">
@@ -114,7 +114,7 @@
     <div class="menu-gerafik">
       <!-- Sidebar statistik -->
       <div class="w-full lg:w-1/4 p-4 bg-gray-100 rounded-xl shadow-md">
-        <i class="fas fa-chart-bar mr-2"></i>
+        <i class="fas fa-chart-pie"></i>
         <span>Statistik Kehadiran</span>
         <div class="space-y-6 max-h-[600px] overflow-y-auto">
           <div v-for="(data, index) in dataStatistikGabungan" :key="index">
@@ -356,205 +356,313 @@ export default {
 <!-- Styles tetap seperti sebelumnya -->
 
 <style scoped>
+/* === Global Container === */
 .container-absen {
   display: flex;
-  gap: 20px;
-  justify-content: space-between;
-  flex-wrap: nowrap;
-  margin-top: 20px;
-  width: 100%;
-  padding: 0 20px;
-  box-sizing: border-box;
+  gap: 24px;
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+  background: #f9fafb;
 }
 
+/* === Main Container (Tabel & Filter) === */
 .container {
   flex: 1;
   margin-top: 90px;
   background: #ffffff;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-  width: 1000px;
-}
-
-.menu-gerafik {
+  padding: 32px;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  width: 200px;
-  padding: 20px;
-  background: #f8f9fa;
-  border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  margin-top: 90px;
+  align-items: center;
+  width: 100%;
+  margin-left: 20px;
 }
 
-.menu-item {
-  margin-bottom: 10px;
+h1 {
+  font-size: 1.8rem;
+  color: #2c3e50;
+  margin-bottom: 28px;
+  font-weight: 600;
+  width: 100%;
+  text-align: center;
 }
 
-.menu-link {
-  text-decoration: none;
-  color: #333;
-  padding: 10px;
-  display: block;
-  border-radius: 8px;
-  transition: background 0.3s, color 0.3s;
-}
-
-.menu-link:hover {
-  background-color: #007bff;
-  color: #fff;
-}
-
+/* === Filter Section (Improved) === */
 .filter-wrapper {
   display: flex;
-  gap: 20px;
-  margin-bottom: 20px;
+  gap: 16px;
+  margin-bottom: 28px;
   flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
+  align-items: flex-end;
+  width: 100%;
+  max-width: 1000px;
+  background: #f8fafc;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
 }
 
 .filter-container {
   display: flex;
   flex-direction: column;
+  min-width: 160px;
+  flex-grow: 1;
 }
 
-.form-control {
-  padding: 8px;
+.filter-container label {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.form-control, .input {
+  padding: 10px 12px;
+  border: 1px solid #e2e8f0;
   border-radius: 8px;
-  border: 1px solid #ccc;
-  min-width: 160px;
+  font-size: 0.875rem;
+  background: white;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  width: 100%;
+}
+
+.form-control:focus, .input:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+/* Perbaikan untuk select box */
+select.form-control {
+  height: 40px; /* Sesuaikan dengan tinggi input text */
+  appearance: none; /* Hilangkan style default browser */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px;
+  padding-right: 30px; /* Beri ruang untuk ikon panah */
+}
+
+/* Pastikan semua input dan select memiliki tinggi yang sama */
+.form-control, .input, select.form-control {
+  min-height: 40px;
+  box-sizing: border-box; /* Pastikan padding tidak mempengaruhi tinggi */
+}
+
+/* Hover state untuk select */
+select.form-control:hover {
+  border-color: #cbd5e1;
+}
+
+/* Focus state untuk select */
+select.form-control:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 }
 
 .btn-reset {
-  background-color: transparent;
-  color: #007bff;
-  font-size: 24px;
-  padding: 10px;
-  border: 2px solid #007bff;
-  border-radius: 50%;
+  background: #f1f5f9;
+  color: #64748b;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 12px;
   cursor: pointer;
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s ease;
-  width: 40px;
   height: 40px;
+  width: 40px;
 }
 
 .btn-reset:hover {
-  background-color: #5a6268;
+  background: #e2e8f0;
+  color: #475569;
 }
 
+.btn-reset i {
+  font-size: 14px;
+}
+
+/* === Table Section (Improved) === */
 .table {
   width: 100%;
   border-collapse: collapse;
-  border-radius: 8px;
+  margin-bottom: 24px;
+  border-radius: 12px;
   overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .table thead {
-  background: linear-gradient(135deg, #9099a2, #96858f);
+  background: #4f46e5;
   color: white;
-  font-weight: bold;
+  position: sticky;
+  top: 0;
 }
 
-.table thead th {
-  padding: 12px;
+.table th, .table td {
+  padding: 14px 12px;
   text-align: center;
+  border-bottom: 1px solid #f1f5f9;
+  word-wrap: break-word;
 }
 
-.table tbody td {
-  padding: 10px;
-  text-align: center;
-  border-bottom: 1px solid #ddd;
+.table th {
+  font-weight: 500;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
+.table td {
+  font-size: 0.875rem;
+  color: #334155;
+}
+
+/* Kolom lebih proporsional */
+.table th:nth-child(1), .table td:nth-child(1) { width: 7%; } /* No */
+.table th:nth-child(2), .table td:nth-child(2) { width: 12%; } /* NIS */
+.table th:nth-child(3), .table td:nth-child(3) { width: 20%; } /* Nama */
+.table th:nth-child(4), .table td:nth-child(4) { width: 15%; } /* Jurusan */
+.table th:nth-child(5), .table td:nth-child(5) { width: 10%; } /* Kelas */
+.table th:nth-child(6), .table td:nth-child(6) { width: 10%; } /* Hadir */
+.table th:nth-child(7), .table td:nth-child(7) { width: 10%; } /* Sakit */
+.table th:nth-child(8), .table td:nth-child(8) { width: 10%; } /* Izin */
+.table th:nth-child(9), .table td:nth-child(9) { width: 10%; } /* Alfa */
+
+/* Hover effect */
 .table tbody tr:hover {
-  background: #f2f2f2;
+  background: #f8fafc;
 }
 
-.nama-siswa {
-  font-weight: bold;
-  font-size: 1.1rem;
-  color: black;
-  cursor: pointer;
-  transition: all 0.3s ease-in-out;
-  position: relative;
-}
-
-.nama-siswa:hover {
-  color: #606060;
-}
-
-.nama-siswa::after {
-  content: "";
-  display: block;
-  width: 0;
-  height: 2px;
-  background: #a88f7f;
-  transition: width 0.3s;
-  position: absolute;
-  bottom: -3px;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-.nama-siswa:hover::after {
+/* === Action Buttons === */
+.button-container {
+  display: flex;
+  gap: 16px;
+  margin-top: 24px;
   width: 100%;
+  justify-content: center;
+  max-width: 1000px;
 }
 
 .button-download {
-  padding: 10px 15px;
-  background-color: #007bff;
+  background: #4f46e5;
   color: white;
   border: none;
-  border-radius: 10px;
+  border-radius: 8px;
+  padding: 10px 20px;
   cursor: pointer;
-  margin-right: 10px;
+  transition: all 0.2s ease;
+  font-weight: 500;
 }
 
 .button-download:hover {
-  background-color: #0056b3;
+  background: #4338ca;
 }
 
 .button-hapus {
-  padding: 10px 15px;
-  background-color: red;
+  background: #ef4444;
   color: white;
   border: none;
-  border-radius: 10px;
+  border-radius: 8px;
+  padding: 10px 20px;
   cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.button-hapus:hover {
+  background: #dc2626;
 }
 
 .button-hapus:disabled {
-  background-color: gray;
+  background: #fca5a5;
   cursor: not-allowed;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
+/* === Sidebar Grafik === */
+.menu-gerafik {
+  width: 320px;
+  margin-top: 90px;
+  background: #ffffff;
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  height: fit-content;
+  margin-left: 30px;
+}
+
+.menu-gerafik i {
+  margin-right: 8px;
+  color: #4f46e5;
+}
+
+.menu-gerafik span {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+/* === Responsive Adjustments === */
+@media (max-width: 1200px) {
   .container-absen {
     flex-direction: column;
-    padding: 0 10px;
+    align-items: center;
   }
 
   .menu-gerafik {
     width: 100%;
-    flex-direction: row;
-    justify-content: space-around;
-    margin-top: 20px;
+    max-width: 1000px;
+    margin-top: 32px;
+  }
+}
+
+@media (max-width: 992px) {
+  .container {
+    padding: 28px 20px;
   }
 
-  .menu-item {
-    flex: 1;
-    text-align: center;
+  .table th:nth-child(3), .table td:nth-child(3) { width: 18%; } /* Nama */
+  .table th:nth-child(4), .table td:nth-child(4) { width: 12%; } /* Jurusan */
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 24px 16px;
   }
 
-  .menu-link {
-    padding: 10px 0;
+  .filter-wrapper {
+    flex-direction: column;
+    gap: 12px;
   }
+
+  .filter-container {
+    max-width: 100%;
+  }
+
+  .button-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* Adjust table columns for mobile */
+  .table th, .table td {
+    padding: 12px 8px;
+    font-size: 0.8rem;
+  }
+
+  .table th:nth-child(1), .table td:nth-child(1) { width: 8%; }
+  .table th:nth-child(2), .table td:nth-child(2) { width: 12%; }
+  .table th:nth-child(3), .table td:nth-child(3) { width: 22%; }
+  .table th:nth-child(4), .table td:nth-child(4) { width: 14%; }
+  .table th:nth-child(5), .table td:nth-child(5) { width: 12%; }
+  .table th:nth-child(n+6), .table td:nth-child(n+6) { width: 8%; }
 }
 </style>
